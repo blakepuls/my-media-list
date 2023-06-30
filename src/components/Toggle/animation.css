@@ -1,0 +1,7 @@
+.toggle-dot {
+  transition: transform 150ms;
+}
+
+.toggle-dot-on {
+  transform: translateX(50%);
+}

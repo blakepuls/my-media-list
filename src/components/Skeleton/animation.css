@@ -1,0 +1,17 @@
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    #424059 50%,
+    transparent 70%
+  );
+  background-size: 200%;
+  background-position: 100% 0;
+  animation: anim 1.5s infinite;
+}
+
+@keyframes anim {
+  to {
+    background-position: -100% 0;
+  }
+}

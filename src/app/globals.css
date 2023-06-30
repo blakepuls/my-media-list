@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 text-white shadow-md rounded-md hover:-translate-y-0.5 hover:shadow-lg transition duration-300 p-2.5;
+    @apply active:translate-y-0 active:shadow-none;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0;
+    @apply flex items-center gap-1.5 outline-none justify-center;
+    @apply text-center;
+  }
+  .btn-secondary {
+    @apply bg-gray-700 cursor-pointer text-white shadow-md rounded-md hover:bg-gray-600 hover:shadow-lg transition duration-300 p-2.5;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply flex items-center gap-1.5 outline-none justify-center;
+    @apply flex items-center gap-1.5 outline-none;
+  }
+
+  .input {
+    @apply bg-gray-700 text-white shadow-md rounded-md hover:bg-gray-600 hover:shadow-lg transition duration-300 p-2.5;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply flex items-center gap-1.5 outline-none;
+  }
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -18,10 +40,24 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+}
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: transparent;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #621aa1;
+  border-radius: 10px;
+  /* border: 3px solid #ffffff; */
 }

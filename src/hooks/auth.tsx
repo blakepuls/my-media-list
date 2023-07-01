@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { Database } from "@/utils/database.types";
-import supabase from "@/utils/supabase"; // import your Supabase client
+import supabase from "@/utils/supabase-browser"; // import your Supabase client
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 

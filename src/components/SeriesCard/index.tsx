@@ -9,27 +9,44 @@ interface MediaResultProps {
   result: IAnimeResult | IMovieResult | IMangaResult;
   type: "Anime" | "Movie" | "Manga";
   onList: boolean;
+  seriesId: number;
 }
 
-export function SeriesCard({ result, type, onList }: MediaResultProps) {
+export function SeriesCard({
+  result,
+  type,
+  onList,
+  seriesId,
+}: MediaResultProps) {
   const [isOnList, setIsOnList] = useState(onList);
 
   async function listAdd() {
     try {
       type === "Manga"
-        ? await addSeriesList("readlist", result.id, "anilist")
-        : await addSeriesList("watchlist", result.id, "tmdb");
+        ? await addSeriesList(result.id, "manga")
+        : await addSeriesList(
+            result.id,
+            result.type === "Movie" ? "movie" : "tv"
+          );
       setIsOnList(true);
       toast.success("Added to watchlist!");
     } catch (error: any) {
+      if (error.message.includes("Series already")) {
+        setIsOnList(true);
+      }
+
       toast.error(error?.message);
     }
   }
 
   async function listRemove() {
     try {
-      await removeSeriesList("watchlist", result.id, type);
-
+      type === "Manga"
+        ? await removeSeriesList(result.seriesId, "manga")
+        : await removeSeriesList(
+            result.seriesId,
+            result.type === "Movie" ? "movie" : "tv"
+          );
       setIsOnList(false);
       toast.success("Removed from watchlist!");
     } catch (error: any) {
@@ -59,7 +76,7 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
             onClick={listAdd}
           >
             <BsFillBookmarkPlusFill />
-            Watchlist
+            {["Movie", "TV Series"].includes(type) ? "Watchlist" : "Readlist"}
           </button>
         )}
         <button className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1">

@@ -9,8 +9,11 @@ function Series() {}
 
 export default function Profile() {
   function test() {
-    fetch("/api/series", {
+    fetch("/api/series/tmdb/123", {
       method: "POST",
+      body: JSON.stringify({
+        priority: 1,
+      }),
     });
   }
 

@@ -1,59 +1,42 @@
 import { useAuth } from "@/hooks/auth";
-import supabase from "./supabase";
+import supabase from "./supabase-browser";
 
 type ListType = "watchlist" | "readlist";
 
 // Add series to watchlist
 export const addSeriesList = async (
-  type: ListType,
   id: string,
-  provider: string
+  // provider: string,
+  type: "tv" | "movie" | "manga"
 ) => {
-  const { data: user } = await supabase.auth.getUser();
-
-  if (!user?.user) {
-    throw new Error("User not authenticated");
+  let provider = "tmdb";
+  if (type === "manga") {
+    provider = "anilist-manga";
   }
 
-  const { data: watchlist } = await supabase
-    .from(`profile_${type}s`)
-    .select("*")
-    .eq("profile_id", user?.user?.id);
+  const res = await fetch(`/api/seriesList/${provider}/${id}`, {
+    method: "POST",
+    body: JSON.stringify({
+      priority: 1,
+      type: type,
+    }),
+  });
 
-  // Check if watchlist contains series
-  const { data: watchlistContains } = await supabase
-    .from(`profile_${type}s`)
-    .select("*")
-    .eq("profile_id", user?.user?.id)
-    .eq("series_id", id)
-    .eq("provider", provider);
+  const data = await res.json();
 
-  if ((watchlistContains?.length || 0) > 0) {
-    throw new Error("Series already in watchlist");
+  //If status isn't 200, throw error
+  if (res.status !== 200) {
+    throw new Error(data.message);
   }
 
-  // Using supabase add to watchlist
-  const { error } = await supabase.from(`profile_${type}s`).insert([
-    {
-      profile_id: user?.user?.id,
-      series_id: id,
-      provider: provider,
-      priority: watchlist ? watchlist.length + 1 : 1,
-    },
-  ]);
-
-  if (error) {
-    throw new Error(`Failed to add to watchlist`);
-  }
-
-  return true;
+  return data;
 };
 
 // Remove series from watchlist
 export const removeSeriesList = async (
-  type: ListType,
   id: string,
-  provider: string
+  // provider: string,
+  type: "tv" | "movie" | "manga"
 ) => {
   const { data: user } = await supabase.auth.getUser();
 
@@ -61,15 +44,20 @@ export const removeSeriesList = async (
     return;
   }
 
+  let provider = "tmdb";
+  if (type === "manga") {
+    provider = "anilist-manga";
+  }
+
   const { data, error } = await supabase
     .from(`profile_${type}s`)
     .delete()
     .eq("profile_id", user?.user?.id)
-    .eq("series_id", id)
-    .eq("provider", provider);
+    .eq("series_id", id);
 
   if (error) {
-    throw new Error(`Failed to remove from watchlist`);
+    console.error(error);
+    throw new Error(`Failed to remove from watchlist ${id}`);
   }
 
   return data;

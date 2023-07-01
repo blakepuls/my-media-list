@@ -14,14 +14,13 @@ import {
   ISearch,
 } from "@consumet/extensions/dist/models/types";
 import { usePathname } from "next/navigation";
-import { toast } from "react-toastify";
 import { CSSTransition } from "react-transition-group";
 import "./animation.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import Checkbox from "../Checkbox";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { addSeriesList, removeSeriesList } from "@/utils";
-import supabase from "@/utils/supabase";
+import supabase from "@/utils/supabase-browser";
 import { useAuth } from "@/hooks/auth";
 import { SeriesCard } from "../SeriesCard";
 
@@ -37,16 +36,18 @@ interface MangaResult extends IMangaResult {
   onList: boolean;
 }
 
-interface ISearchResult {
-  animes: any;
-  movies: any;
-  mangas: any;
+interface SeriesSearchResult {
+  currentPage?: number;
+  hasNextPage?: boolean;
+  results: any[];
+  totalPages?: number;
+  totalResults?: number;
 }
 
-// Fetch metadata for a specific id from a specific type
-async function fetchMeta(id: string, type: string): Promise<any> {
-  const res = await fetch(`https://api.consumet.org/meta/${type}?id=${id}`);
-  return await res.json();
+export interface ISearchResult {
+  animes: SeriesSearchResult;
+  movies: SeriesSearchResult;
+  mangas: SeriesSearchResult;
 }
 
 async function universalSearch(search: string): Promise<ISearchResult | null> {
@@ -54,20 +55,18 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
 
   const { data } = await supabase.auth.getUser();
 
-  const { data: watchlist } = await supabase
-    .from("profile_watchlists")
-    .select("*")
-    .eq("profile_id", data.user?.id);
-
   const { data: readlist } = await supabase
     .from("profile_readlists")
     .select("*")
     .eq("profile_id", data.user?.id);
 
-  console.log("readlist", readlist);
-
   const movieRes = await fetch(`https://api.consumet.org/meta/tmdb/${search}`);
   const movies = await movieRes.json();
+
+  const mangaRes = await fetch(
+    `https://api.consumet.org/meta/anilist-manga/${search}`
+  );
+  const mangas = await mangaRes.json();
 
   // Remove movies that have an image string that includes "originalnull" or "originalundefined"
   movies.results = movies.results.filter(
@@ -76,73 +75,65 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       !movie.image.includes("originalundefined")
   );
 
-  console.log("watchlist", watchlist);
+  // Fetch series that match each movie's provider and provider id
+  const { data: series } = await supabase
+    .from("series")
+    .select("id, provider, provider_id")
+    .in("provider_id", [
+      movies?.results?.map((movie: any) => movie.id.toString()),
+      mangas?.results?.map((manga: any) => manga.id.toString()),
+    ]);
 
-  // Mark movies that are in the user's watchlist
-  movies.results = movies.results.map((movie: any) => {
-    const watchlistItem = watchlist?.find(
-      (item: any) =>
-        item.series_id === movie.id.toString() && item.provider === "tmdb"
-    );
+  if (series) {
+    const { data: watchlist } = await supabase
+      .from("profile_watchlists")
+      .select("*")
+      .eq("profile_id", data.user?.id)
+      .in(
+        "series_id",
+        series?.map((s: any) => s.id)
+      );
 
-    if (watchlistItem) {
-      movie.onList = true;
-    } else {
-      movie.onList = false;
-    }
+    // Connect the series to the movies
+    movies.results = movies.results.map((movie: any) => {
+      const seriesId = series.find(
+        (s: any) => s.provider_id === movie.id.toString()
+      )?.id;
+      const onList = watchlist?.some((w: any) => w.series_id === seriesId);
+      return { ...movie, seriesId, onList };
+    });
 
-    return movie;
-  });
+    const { data: readlist } = await supabase
+      .from("profile_readlists")
+      .select("*")
+      .eq("profile_id", data.user?.id)
+      .in(
+        "series_id",
+        series?.map((s: any) => s.id)
+      );
 
-  // movies.results = movies.results.filter((movie: any) => movie.rating > 0);
+    // Connect the series to the mangas
+    mangas.results = mangas.results.map((manga: any) => {
+      const seriesId = series.find(
+        (s: any) => s.provider_id === manga.id.toString()
+      )?.id;
+      const onList = readlist?.some((w: any) => w.series_id === seriesId);
+      return { ...manga, seriesId, onList };
+    });
 
-  const animeRes = await fetch(
-    `https://api.consumet.org/meta/anilist/${search}`
-  );
-  const animes = await animeRes.json();
-
-  // Mark animes that are in the user's watchlist
-  // animes.results = animes.results.map((anime: any) => {
-  //   const watchlistItem = watchlist?.find(
-  //     (item: any) => item.anilist_id === anime.id
-  //   );
-
-  //   if (watchlistItem) {
-  //     anime.watchlist = true;
-  //   } else {
-  //     anime.watchlist = false;
-  //   }
-  // });
-
-  const mangaRes = await fetch(
-    `https://api.consumet.org/meta/anilist-manga/${search}`
-  );
-  const mangas = await mangaRes.json();
-
-  //Mark mangas that are in the user's readlist
-  mangas.results = mangas.results.map((manga: any) => {
-    const readlistItem = readlist?.find(
-      (item: any) =>
-        item.series_id === manga.id.toString() && item.provider === "anilist"
-    );
-
-    if (readlistItem) {
-      manga.onList = true;
-    } else {
-      manga.onList = false;
-    }
-
-    return manga;
-  });
+    console.log("big boy", series, readlist, mangas.results);
+  }
 
   return {
-    animes,
+    animes: undefined!,
     movies,
     mangas,
   };
 }
 
-interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface SearchProps {
+  onChange?: (results: ISearchResult) => void;
+}
 
 export default (props: SearchProps) => {
   const router = useRouter(); // Hook for routing
@@ -154,11 +145,9 @@ export default (props: SearchProps) => {
     animes: {
       results: [],
     },
-
     movies: {
       results: [],
     },
-
     mangas: {
       results: [],
     },
@@ -174,10 +163,16 @@ export default (props: SearchProps) => {
   useEffect(() => {
     const search = searchParams.get("search");
     if (search) {
+      // Set input value to search query
+      if (inputRef.current) {
+        inputRef.current.value = search;
+      }
+
       // If there is a search query in the URL, fetch it
       universalSearch(search).then((results) => {
         if (results) {
           setSearchResults(results);
+          props.onChange?.(results);
         }
       });
     }
@@ -201,11 +196,9 @@ export default (props: SearchProps) => {
       setSearchResults(results);
 
       // Add the search query to the URL (without adding a new entry into the browser’s history stack)
-      router.replace(`/?search=${search}`);
+      router.replace(`/browse?search=${search}`);
     }, 500);
   };
-
-  if (pathname != "/") return;
 
   return (
     <div
@@ -220,60 +213,11 @@ export default (props: SearchProps) => {
         className="bg-transparent h-full w-full rounded-lg text-sm outline-none"
         onChange={handleSearch}
       />
-      <Filter />
 
-      <SearchResults
-        animeResults={searchResults.animes}
-        movieResults={searchResults.movies}
-        mangaResults={searchResults.mangas}
-      />
+      {/* <Filter /> */}
     </div>
   );
 };
-
-interface SearchResultsProps {
-  animeResults: ISearch<AnimeResult>;
-  movieResults: ISearch<SeriesResult>;
-  mangaResults?: ISearch<MangaResult>;
-}
-
-function SearchResults({
-  animeResults,
-  movieResults,
-  mangaResults,
-}: SearchResultsProps) {
-  return (
-    <div className="absolute top-14  left-0">
-      <div className="flex flex-wrap gap-3 p-3 justify-center items-center">
-        {movieResults?.results?.map((result) => {
-          return (
-            <SeriesCard
-              key={result.id}
-              result={result}
-              type="Movie"
-              onList={result.onList}
-            />
-          );
-        })}
-
-        {/* {animeResults?.results?.map((result) => {
-          return <MediaResult key={result.id} result={result} type="Anime" />;
-        })} */}
-
-        {mangaResults?.results?.map((result) => {
-          return (
-            <SeriesCard
-              key={result.id}
-              result={result}
-              type="Manga"
-              onList={result.onList}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 const Filter = () => {
   const [filterOpen, setFilterOpen] = useState(false);

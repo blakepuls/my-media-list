@@ -3,7 +3,7 @@
 import Input from "@/components/Input";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import supabase from "@/utils/supabase";
+import supabase from "@/utils/supabase-browser";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/auth";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";

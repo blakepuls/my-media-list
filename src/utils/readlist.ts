@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/auth";
-import supabase from "./supabase";
+import supabase from "./supabase-browser";
 
 // Add series to readlist
 export const addToReadlist = async (id: string, provider: string) => {

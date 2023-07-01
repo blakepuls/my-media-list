@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import supabase from "@/utils/supabase";
+import supabase from "@/utils/supabase-browser";
 import { useAuth } from "@/hooks/auth";
 import Input from "@/components/Input";
 import Image from "next/image";

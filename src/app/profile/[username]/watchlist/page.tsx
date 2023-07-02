@@ -18,8 +18,6 @@ export default function Profile() {
   }
 
   return (
-    <main className="flex flex-col items-center gap-3 mt-10 w-full">
-      <button onClick={test}>Test</button>
-    </main>
+    <main className="flex flex-col items-center gap-3 mt-10 w-full"></main>
   );
 }

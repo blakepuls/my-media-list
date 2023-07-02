@@ -12,47 +12,90 @@ interface MediaResultProps {
   seriesId: number;
 }
 
-export function SeriesCard({
-  result,
-  type,
-  onList,
-  seriesId,
-}: MediaResultProps) {
+export function SeriesCard({ result, type, onList }: MediaResultProps) {
   const [isOnList, setIsOnList] = useState(onList);
+  const [seriesId, setSeriesId] = useState(result.seriesId);
 
-  async function listAdd() {
-    try {
+  function listAdd() {
+    const promise =
       type === "Manga"
-        ? await addSeriesList(result.id, "manga")
-        : await addSeriesList(
-            result.id,
-            result.type === "Movie" ? "movie" : "tv"
-          );
-      setIsOnList(true);
-      toast.success("Added to watchlist!");
-    } catch (error: any) {
-      if (error.message.includes("Series already")) {
+        ? addSeriesList(result.id, "manga")
+        : addSeriesList(result.id, result.type === "Movie" ? "movie" : "tv");
+
+    toast
+      .promise(promise, {
+        pending: "Adding to watchlist...",
+        success: "Added to watchlist!",
+        error: {
+          render({ data }: any) {
+            if (data.message.includes("Series already")) {
+              setIsOnList(true);
+            }
+            return data.message;
+          },
+        },
+      })
+      .then((data) => {
+        console.log("doota", data.data.series_id);
+        setSeriesId(data.data.series_id);
         setIsOnList(true);
-      }
-
-      toast.error(error?.message);
-    }
+      })
+      .catch(() => {});
   }
 
-  async function listRemove() {
-    try {
+  function listRemove() {
+    const promise =
       type === "Manga"
-        ? await removeSeriesList(result.seriesId, "manga")
-        : await removeSeriesList(
-            result.seriesId,
-            result.type === "Movie" ? "movie" : "tv"
-          );
-      setIsOnList(false);
-      toast.success("Removed from watchlist!");
-    } catch (error: any) {
-      toast.error(error?.message);
-    }
+        ? removeSeriesList(seriesId, "manga")
+        : removeSeriesList(seriesId, result.type === "Movie" ? "movie" : "tv");
+
+    toast
+      .promise(promise, {
+        pending: "Removing from watchlist...",
+        success: "Removed from watchlist!",
+        error: {
+          render({ data }: any) {
+            return data.message;
+          },
+        },
+      })
+      .then(() => setIsOnList(false))
+      .catch(() => {});
   }
+
+  // async function listAdd() {
+  //   try {
+  //     type === "Manga"
+  //       ? await addSeriesList(result.id, "manga")
+  //       : await addSeriesList(
+  //           result.id,
+  //           result.type === "Movie" ? "movie" : "tv"
+  //         );
+  //     setIsOnList(true);
+  //     toast.success("Added to watchlist!");
+  //   } catch (error: any) {
+  //     if (error.message.includes("Series already")) {
+  //       setIsOnList(true);
+  //     }
+
+  //     toast.error(error?.message);
+  //   }
+  // }
+
+  // async function listRemove() {
+  //   try {
+  //     type === "Manga"
+  //       ? await removeSeriesList(result.seriesId, "manga")
+  //       : await removeSeriesList(
+  //           result.seriesId,
+  //           result.type === "Movie" ? "movie" : "tv"
+  //         );
+  //     setIsOnList(false);
+  //     toast.success("Removed from watchlist!");
+  //   } catch (error: any) {
+  //     toast.error(error?.message);
+  //   }
+  // }
 
   return (
     <div className="relative flex flex-col gap-0.5 rounded-md w-52 ">

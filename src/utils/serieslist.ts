@@ -44,20 +44,24 @@ export const removeSeriesList = async (
     return;
   }
 
+  let list = "watchlist";
+  if (type === "manga") {
+    list = "readlist";
+  }
+
   let provider = "tmdb";
   if (type === "manga") {
     provider = "anilist-manga";
   }
 
   const { data, error } = await supabase
-    .from(`profile_${type}s`)
+    .from(`profile_${list}s`)
     .delete()
     .eq("profile_id", user?.user?.id)
     .eq("series_id", id);
 
   if (error) {
-    console.error(error);
-    throw new Error(`Failed to remove from watchlist ${id}`);
+    throw new Error(`Failed to remove from watchlist`);
   }
 
   return data;

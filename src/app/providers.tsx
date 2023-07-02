@@ -6,6 +6,7 @@ import { Flip, ToastContainer } from "react-toastify";
 import { DetectedChangesProvider } from "@/hooks/DetectedChanges";
 import DetectedChangesContainer from "@/components/DetectedChanges";
 import "react-toastify/dist/ReactToastify.css";
+import "./globals.css";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -17,7 +18,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         newestOnTop={false}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
         draggable
         pauseOnHover
         theme="dark"

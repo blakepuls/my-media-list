@@ -95,7 +95,7 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       );
 
     // Connect the series to the movies
-    movies.results = movies.results.map((movie: any) => {
+    movies.results = movies.results?.map((movie: any) => {
       const seriesId = series.find(
         (s: any) => s.provider_id === movie.id.toString()
       )?.id;
@@ -113,7 +113,7 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       );
 
     // Connect the series to the mangas
-    mangas.results = mangas.results.map((manga: any) => {
+    mangas.results = mangas.results?.map((manga: any) => {
       const seriesId = series.find(
         (s: any) => s.provider_id === manga.id.toString()
       )?.id;

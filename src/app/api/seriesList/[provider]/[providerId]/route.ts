@@ -23,6 +23,10 @@ async function queryProviderForSeries(
     const tmdb = new META.TMDB();
     const series = await tmdb.fetchMediaInfo(provider_id, type);
 
+    if (series.message) {
+      return;
+    }
+
     return {
       provider,
       provider_id,
@@ -41,7 +45,10 @@ async function queryProviderForSeries(
     );
     const manga = await mangaRes.json();
 
-    console.log("proviuder", manga);
+    if (manga.message) {
+      return;
+    }
+
     const releaseDate =
       manga.startDate &&
       `${manga.startDate.year}-${String(manga.startDate.month).padStart(
@@ -153,7 +160,7 @@ export async function POST(
   }
 
   // Link the series to the user's watchlist
-  const { error: watchlistError } = await supabase
+  const { data: watchlistData, error: watchlistError } = await supabase
     .from(`profile_${series.provider === "tmdb" ? "watchlists" : "readlists"}`)
     .insert([
       {
@@ -161,7 +168,8 @@ export async function POST(
         series_id: series.id,
         priority: body.priority,
       },
-    ]);
+    ])
+    .select("*");
 
   if (watchlistError) {
     // Handle error
@@ -177,6 +185,7 @@ export async function POST(
   return NextResponse.json(
     {
       message: "Series added to watchlist successfully",
+      data: watchlistData[0],
     },
     { status: 200 }
   );

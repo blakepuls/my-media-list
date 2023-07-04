@@ -4,6 +4,19 @@ import { useState } from "react";
 import { AiFillTrophy, AiFillStar } from "react-icons/ai";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { toast } from "react-toastify";
+import Skeleton from "../Skeleton";
+
+export function SeriesCardSkeleton() {
+  return (
+    <div className="flex flex-col items-center gap-2 w-52">
+      <Skeleton className="w-full h-72 !rounded-sm" />
+      <div className="h-12 w-full flex flex-col gap-2">
+        <Skeleton className="w-2/3 h-4 !rounded-sm" />
+        <Skeleton className="w-1/3 h-4 !rounded-sm" />
+      </div>
+    </div>
+  );
+}
 
 interface MediaResultProps {
   result: IAnimeResult | IMovieResult | IMangaResult;
@@ -12,7 +25,7 @@ interface MediaResultProps {
   seriesId: number;
 }
 
-export function SeriesCard({ result, type, onList }: MediaResultProps) {
+export default function SeriesCard({ result, type, onList }: MediaResultProps) {
   const [isOnList, setIsOnList] = useState(onList);
   const [seriesId, setSeriesId] = useState(result.seriesId);
 
@@ -36,7 +49,6 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
         },
       })
       .then((data) => {
-        console.log("doota", data.data.series_id);
         setSeriesId(data.data.series_id);
         setIsOnList(true);
       })
@@ -63,42 +75,11 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
       .catch(() => {});
   }
 
-  // async function listAdd() {
-  //   try {
-  //     type === "Manga"
-  //       ? await addSeriesList(result.id, "manga")
-  //       : await addSeriesList(
-  //           result.id,
-  //           result.type === "Movie" ? "movie" : "tv"
-  //         );
-  //     setIsOnList(true);
-  //     toast.success("Added to watchlist!");
-  //   } catch (error: any) {
-  //     if (error.message.includes("Series already")) {
-  //       setIsOnList(true);
-  //     }
-
-  //     toast.error(error?.message);
-  //   }
-  // }
-
-  // async function listRemove() {
-  //   try {
-  //     type === "Manga"
-  //       ? await removeSeriesList(result.seriesId, "manga")
-  //       : await removeSeriesList(
-  //           result.seriesId,
-  //           result.type === "Movie" ? "movie" : "tv"
-  //         );
-  //     setIsOnList(false);
-  //     toast.success("Removed from watchlist!");
-  //   } catch (error: any) {
-  //     toast.error(error?.message);
-  //   }
-  // }
-
   return (
-    <div className="relative flex flex-col gap-0.5 rounded-md w-52 ">
+    <div
+      className="relative flex flex-col  rounded-md w-52 "
+      onClick={() => console.log(result)}
+    >
       <img
         src={result.image}
         alt={result.title.toString()}
@@ -107,7 +88,7 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
       <div className="absolute top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
         {isOnList ? (
           <button
-            className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+            className="m-2 outline-none flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
             onClick={listRemove}
           >
             <BsFillBookmarkPlusFill className="text-yellow-500" />
@@ -115,7 +96,7 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
           </button>
         ) : (
           <button
-            className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+            className="m-2 flex outline-none items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
             onClick={listAdd}
           >
             <BsFillBookmarkPlusFill />
@@ -128,12 +109,9 @@ export function SeriesCard({ result, type, onList }: MediaResultProps) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-0.5 overflow-hidden h-14 ">
+      <div className="flex flex-col gap-0.5 overflow-hidden h-14 p-1">
         <h1 className="whitespace-nowrap text-left font-semibold overflow-hidden">
-          {type == "Movie"
-            ? result.title.toString()
-            : // @ts-ignore
-              result.title.english || result.title.romaji}
+          {result.title.toString()}
         </h1>
 
         <section className="flex items-center  text-gray-300">
@@ -169,22 +147,10 @@ interface RatingProps {
 }
 
 const Rating = ({ rating, type }: RatingProps) => {
-  const formatRating = {
-    Anime: (rating: number) => rating / 10,
-    Manga: (rating: number) => rating / 10,
-    Movie: (rating: number) => Math.round(rating * 10) / 10,
-  };
-
-  const formattedRating = formatRating[type]
-    ? formatRating[type](rating)
-    : rating;
-
-  if (rating == 0) return null;
-
   return (
     <div className="ml-auto flex items-center gap-0.5  text-white bg-opacity-80 rounded-md">
       <AiFillStar className="text-yellow-500" />
-      <span className="text-yellow-500">{formattedRating}</span>
+      <span className="text-yellow-500">{rating}</span>
     </div>
   );
 };

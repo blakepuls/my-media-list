@@ -22,7 +22,6 @@ import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { addSeriesList, removeSeriesList } from "@/utils";
 import supabase from "@/utils/supabase-browser";
 import { useAuth } from "@/hooks/auth";
-import { SeriesCard } from "../SeriesCard";
 
 interface AnimeResult {
   onList: boolean;
@@ -44,10 +43,16 @@ interface SeriesSearchResult {
   totalResults?: number;
 }
 
-export interface ISearchResult {
+interface ISearchResult {
   animes: SeriesSearchResult;
   movies: SeriesSearchResult;
   mangas: SeriesSearchResult;
+}
+
+export interface ISearchState {
+  status: "idle" | "loading" | "success" | "error";
+  results?: ISearchResult;
+  error?: string;
 }
 
 async function universalSearch(search: string): Promise<ISearchResult | null> {
@@ -55,10 +60,10 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
 
   const { data } = await supabase.auth.getUser();
 
-  const { data: readlist } = await supabase
-    .from("profile_readlists")
-    .select("*")
-    .eq("profile_id", data.user?.id);
+  // const { data: readlist } = await supabase
+  //   .from("profile_readlists")
+  //   .select("*")
+  //   .eq("profile_id", data.user?.id);
 
   const movieRes = await fetch(`https://api.consumet.org/meta/tmdb/${search}`);
   const movies = await movieRes.json();
@@ -74,6 +79,25 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       !movie.image.includes("originalnull") &&
       !movie.image.includes("originalundefined")
   );
+
+  // Remove 2nd decimal place from rating
+  movies.results = movies.results.map((movie: any) => {
+    movie.rating = Math.floor(movie.rating * 10) / 10;
+    if (movie.rating === 0) movie.rating = null;
+    return movie;
+  });
+
+  // Set the title to English if it exists, otherwise use the romaji title.
+  // Change the rating to a 1-10 scale
+  mangas.results = mangas.results?.map((manga: any) => {
+    const title = manga.title.english || manga.title.romaji;
+    manga.rating = manga.rating / 10;
+    // Round the rating to the nearest 0.5
+
+    if (manga.rating === 0) manga.rating = null;
+
+    return { ...manga, title, type: "Manga" };
+  });
 
   // Fetch series that match each movie's provider and provider id
   const { data: series } = await supabase
@@ -120,8 +144,6 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       const onList = readlist?.some((w: any) => w.series_id === seriesId);
       return { ...manga, seriesId, onList };
     });
-
-    console.log("big boy", series, readlist, mangas.results);
   }
 
   return {
@@ -132,35 +154,22 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
 }
 
 interface SearchProps {
-  onChange?: (results: ISearchResult) => void;
+  onChange: (results: ISearchState) => void;
 }
 
-export default (props: SearchProps) => {
+export default function Search(props: SearchProps) {
   const router = useRouter(); // Hook for routing
   const searchParams = useSearchParams(); // Hook for params
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const pathname = usePathname();
-  const [searchResults, setSearchResults] = useState<ISearchResult>({
-    animes: {
-      results: [],
-    },
-    movies: {
-      results: [],
-    },
-    mangas: {
-      results: [],
-    },
-  });
 
   const handleFocus = () => {
     if (inputRef.current) {
       inputRef.current.focus();
-      // props.onChange?.({} as any); http://localhost:3000/api/search?query=one%20piece
     }
   };
 
-  useEffect(() => {
+  async function performSearch() {
     const search = searchParams.get("search");
     if (search) {
       // Set input value to search query
@@ -168,14 +177,28 @@ export default (props: SearchProps) => {
         inputRef.current.value = search;
       }
 
-      // If there is a search query in the URL, fetch it
-      universalSearch(search).then((results) => {
-        if (results) {
-          setSearchResults(results);
-          props.onChange?.(results);
-        }
+      props.onChange?.({
+        status: "loading",
+        results: undefined,
+        error: undefined,
       });
+      // If there is a search query in the URL, fetch it
+      const results = await universalSearch(search);
+
+      if (results) {
+        props.onChange?.({ status: "success", results });
+      } else {
+        props.onChange?.({
+          status: "error",
+          results: undefined,
+          error: "No results",
+        });
+      }
     }
+  }
+
+  useEffect(() => {
+    performSearch();
   }, [searchParams]);
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -187,13 +210,13 @@ export default (props: SearchProps) => {
 
     debounceTimeoutRef.current = setTimeout(async () => {
       const search = e.target.value;
-      const results = await universalSearch(search);
+      // const results = await universalSearch(search);
 
-      if (!results) {
-        return;
-      }
+      // if (!results) {
+      //   return;
+      // }
 
-      setSearchResults(results);
+      // setSearchResults(results);
 
       // Add the search query to the URL (without adding a new entry into the browser’s history stack)
       router.replace(`/browse?search=${search}`);
@@ -217,7 +240,7 @@ export default (props: SearchProps) => {
       {/* <Filter /> */}
     </div>
   );
-};
+}
 
 const Filter = () => {
   const [filterOpen, setFilterOpen] = useState(false);

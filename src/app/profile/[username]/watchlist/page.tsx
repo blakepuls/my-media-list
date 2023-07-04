@@ -1,23 +1,49 @@
-"use client";
+// "use client";
 
-import { SeriesCard } from "@/components/SeriesCard";
+import SeriesCard from "@/components/Series/SeriesCard";
+import SeriesEditor from "@/components/Series/SeriesEditor";
+import SeriesRow from "@/components/Series/SeriesRow";
+import Test from "@/components/Test";
+import { Database } from "@/utils/database.types";
+import supabase from "@/utils/supabase-server";
 import React, { useEffect, useState } from "react";
+import { AiFillStar } from "react-icons/ai";
 
-interface Series {}
+// Revalidate on every request
+export const revalidate = 0;
 
-function Series() {}
+type TSeries = Database["public"]["Tables"]["series"]["Row"];
+type TWatchlist = (Database["public"]["Tables"]["profile_watchlists"]["Row"] & {
+  series: TSeries;
+})[];
 
-export default function Profile() {
-  function test() {
-    fetch("/api/series/tmdb/123", {
-      method: "POST",
-      body: JSON.stringify({
-        priority: 1,
-      }),
-    });
-  }
+export default async function Watchlist({
+  params,
+}: {
+  params: { username: string };
+}) {
+  // const { status } = useAuth();
+  // if (status === "loading") return <div>Loading...</div>;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("username", params.username)
+    .single();
+
+  // Select every watchlist row that belongs to the user
+  const { data: watchlistData } = await supabase
+    .from("profile_watchlists")
+    .select("*, series:series_id(*)")
+    .eq("profile_id", profile?.id);
+
+  const watchlist = watchlistData as unknown as TWatchlist;
 
   return (
-    <main className="flex flex-col items-center gap-3 mt-10 w-full"></main>
+    <main className="flex flex-col items-center gap-3 mt-10 w-full">
+      <section className="flex flex-wrap gap-5">
+        <SeriesEditor list={watchlist} />
+      </section>
+    </main>
   );
 }

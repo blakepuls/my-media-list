@@ -1,0 +1,114 @@
+import { addSeriesList, removeSeriesList } from "@/utils";
+import { IAnimeResult, IMovieResult, IMangaResult } from "@consumet/extensions";
+import { useState } from "react";
+import { AiFillTrophy, AiFillStar } from "react-icons/ai";
+import { BsFillBookmarkPlusFill } from "react-icons/bs";
+import { toast } from "react-toastify";
+import Skeleton from "../Skeleton";
+import { Database } from "@/utils/database.types";
+
+export function SeriesCardSkeleton() {
+  return (
+    <div className="flex flex-col items-center gap-2 w-52">
+      <Skeleton className="w-full h-72 !rounded-sm" />
+      <div className="h-12 w-full flex flex-col gap-2">
+        <Skeleton className="w-2/3 h-4 !rounded-sm" />
+        <Skeleton className="w-1/3 h-4 !rounded-sm" />
+      </div>
+    </div>
+  );
+}
+
+interface SeriesCardProps {
+  series: Database["public"]["Tables"]["series"]["Row"];
+  dragging?: boolean;
+  style?: React.CSSProperties;
+}
+
+export default function SeriesCard({
+  series,
+  style,
+  dragging: isDragging,
+}: SeriesCardProps) {
+  return (
+    <div
+      className={`cursor-pointer relative flex flex-col  rounded-md w-52`}
+      style={style}
+    >
+      <img
+        src={series.image!}
+        alt={series.title.toString()}
+        className="w-full h-72 rounded-sm shadow-md object-cover"
+      />
+      {!isDragging && (
+        <div className="absolute top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+          {/* {isOnList ? (
+            <button
+              className="m-2 outline-none flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+              onClick={listRemove}
+            >
+              <BsFillBookmarkPlusFill className="text-yellow-500" />
+              Remove
+            </button>
+          ) : (
+            <button
+              className="m-2 flex outline-none items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+              onClick={listAdd}
+            >
+              <BsFillBookmarkPlusFill />
+              {["movie", "tv"].includes(type) ? "Watchlist" : "Readlist"}
+            </button>
+          )} */}
+          <button className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1">
+            <AiFillTrophy />
+            Rank
+          </button>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-0.5 overflow-hidden h-14 p-1">
+        <h1 className="whitespace-nowrap text-left font-semibold overflow-hidden">
+          {series.title.toString()}
+        </h1>
+
+        <section className="flex items-center  text-gray-300">
+          <span>
+            {/* @ts-ignore */}
+            {formatType(series.type)}
+          </span>
+
+          {series.release_date && (
+            <>
+              <span className="text-gray-700 mx-1">•</span>
+              <span>{series.release_date.split("-")[0]}</span>
+            </>
+          )}
+
+          {typeof series.rating == "number" && (
+            <Rating rating={series.rating} />
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function formatType(type: "movie" | "tv" | "manga") {
+  // Extract year from date string
+  if (type == "movie") return "Movie";
+  if (type == "tv") return "TV Series";
+  if (type == "manga") return "Manga";
+}
+
+interface RatingProps {
+  rating: number;
+}
+
+const Rating = ({ rating }: RatingProps) => {
+  return (
+    <div className="ml-auto flex items-center gap-0.5  text-white bg-opacity-80 rounded-md">
+      <AiFillStar className="text-yellow-500" />
+      <span className="text-yellow-500">{rating}</span>
+    </div>
+  );
+};

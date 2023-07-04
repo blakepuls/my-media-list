@@ -27,15 +27,20 @@ async function queryProviderForSeries(
       return;
     }
 
+    // Format the series details in the format (7.64 -> 7.6)
+    let rating = series.rating?.toFixed(1);
+    if (rating == "0.0") {
+      rating = undefined;
+    }
     return {
       provider,
       provider_id,
       type: type,
       title: series?.title as string,
       release_date: series?.releaseDate as string,
-      image: series?.image,
+      image: series?.image as string,
       banner: series?.cover,
-      rating: series?.rating,
+      rating: rating as any,
     };
   }
 
@@ -57,6 +62,7 @@ async function queryProviderForSeries(
       )}-${String(manga.startDate.day).padStart(2, "0")}`;
 
     const rating = manga.rating / 10;
+    if (rating === 0) manga.rating = null;
 
     return {
       provider,

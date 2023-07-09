@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import supabaseAdmin from "@/utils/supabase-server";
-import type { Database } from "@/utils/database.types";
+import type { Database } from "@/types/database.types";
 import { META } from "@consumet/extensions";
 
 type TMDBType = "tv" | "movie" | "manga";

@@ -2,9 +2,9 @@
 
 import SeriesCard from "@/components/Series/SeriesCard";
 import SeriesEditor from "@/components/Series/SeriesEditor";
-import SeriesRow from "@/components/Series/SeriesRow";
+import SeriesContainer from "@/components/Series/SeriesContainer";
 import Test from "@/components/Test";
-import { Database } from "@/utils/database.types";
+import { Database } from "@/types/database.types";
 import supabase from "@/utils/supabase-server";
 import React, { useEffect, useState } from "react";
 import { AiFillStar } from "react-icons/ai";

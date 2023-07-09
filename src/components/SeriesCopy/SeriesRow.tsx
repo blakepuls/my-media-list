@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDrag, useDrop, DndProvider, DropTargetMonitor } from "react-dnd";
 import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
 import SeriesCard from "./SeriesCard";
-import { Database } from "@/utils/database.types";
+import { Database } from "@/types/database.types";
 import { useDragLayer } from "react-dnd";
 import { useSpring, useTransition, animated } from "react-spring";
 import FlipMove from "react-flip-move";

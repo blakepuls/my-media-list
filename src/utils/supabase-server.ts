@@ -1,4 +1,4 @@
-import { Database } from "@/utils/database.types";
+import { Database } from "@/types/database.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { createClient } from "@supabase/supabase-js";
 

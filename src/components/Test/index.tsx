@@ -7,7 +7,7 @@ import { AiFillTrophy, AiFillStar } from "react-icons/ai";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 import Skeleton from "../Skeleton";
-import { Database } from "@/utils/database.types";
+import { Database } from "@/types/database.types";
 
 interface TestProps {
   data: any;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   DndContext,
   useDraggable,
@@ -22,6 +22,7 @@ import { SortableItem } from "./SortableItem";
 import Droppable from "./Droppable";
 
 import { arrayMove, insertAtIndex, removeAtIndex } from "./utils/array";
+import { ItemsState, Readlist, Watchlist } from "./SeriesEditor";
 
 type Series = Database["public"]["Tables"]["series"]["Row"];
 
@@ -32,20 +33,20 @@ interface SeriesRowProps {
   // id: string;
 }
 
-const SeriesContainer: React.FC<SeriesRowProps> = (
-  {
-    // series,
-    // id,
-    // children,
-    // setSeries,
-  }
-) => {
-  const [items, setItems] = useState({
-    watching: ["1", "2", "3"],
-    idle: ["4", "5", "6"],
-    dropped: ["7", "8", "9"],
-  });
+interface SeriesContainerProps {
+  list: Watchlist[] | Readlist[];
+  listType: "watchlist" | "readlist";
+  items: ItemsState;
 
+  setItems: Dispatch<SetStateAction<ItemsState>>;
+}
+
+const SeriesContainer: React.FC<SeriesContainerProps> = ({
+  listType,
+  list,
+  items,
+  setItems,
+}) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -53,51 +54,7 @@ const SeriesContainer: React.FC<SeriesRowProps> = (
     })
   );
 
-  const handleDragOver = ({ over, active }: any) => {
-    const overId = over?.id;
-
-    if (!overId) {
-      return;
-    }
-
-    const activeContainer = active.data.current.sortable.containerId;
-    const overContainer = over.data.current?.sortable.containerId;
-
-    if (!overContainer) {
-      return;
-    }
-
-    if (activeContainer !== overContainer) {
-      setItems((items) => {
-        const activeIndex = active.data.current.sortable.index;
-        const overIndex = over.data.current?.sortable.index || 0;
-
-        return moveBetweenContainers(
-          items,
-          activeContainer,
-          activeIndex,
-          overContainer,
-          overIndex,
-          active.id
-        );
-      });
-    }
-  };
-
-  const moveBetweenContainers = (
-    items: any,
-    activeContainer: any,
-    activeIndex: any,
-    overContainer: any,
-    overIndex: any,
-    item: any
-  ) => {
-    return {
-      ...items,
-      [activeContainer]: removeAtIndex(items[activeContainer], activeIndex),
-      [overContainer]: insertAtIndex(items[overContainer], overIndex, item),
-    };
-  };
+  const handleDragOver = ({ over, active }: any) => {};
 
   const handleDragEnd = ({ active, over }: any) => {
     if (!over) {
@@ -121,7 +78,15 @@ const SeriesContainer: React.FC<SeriesRowProps> = (
               overIndex
             ),
           };
+          // Update the priority of each item in the overContainer to match its index
+          newItems[overContainer as "watching" | "idle" | "dropped"] = newItems[
+            overContainer as "watching" | "idle" | "dropped"
+          ].map((item, index) => ({
+            ...item,
+            priority: index + 1, // since priority starts from 1
+          }));
         } else {
+          // Replace active.id with the itemToMove
           newItems = moveBetweenContainers(
             items,
             activeContainer,
@@ -146,16 +111,79 @@ const SeriesContainer: React.FC<SeriesRowProps> = (
       onDragOver={handleDragOver}
     >
       <div className="flex flex-col gap-5  p-3">
-        {Object.keys(items).map((group) => (
-          <Droppable
-            id={group}
-            items={items[group as "watching" | "idle" | "dropped"]}
-            key={group}
-          />
-        ))}
+        {items.watching.length > 0 && (
+          <>
+            <h2 className="text-3xl font-bold text-gray-100">
+              Currently {listType == "watchlist" ? "Watching" : "Reading"}
+            </h2>
+            <Droppable
+              listType={listType}
+              items={items}
+              setItems={setItems}
+              id="watching"
+              series={items.watching.map((item) => item.series)}
+              key="watching"
+            />
+          </>
+        )}
+
+        {items.idle.length > 0 && (
+          <>
+            <h2 className="text-3xl font-bold text-gray-100">
+              {listType == "watchlist" ? "Watchlist" : "Readlist"}
+            </h2>
+            <Droppable
+              listType={listType}
+              items={items}
+              setItems={setItems}
+              id="idle"
+              series={items.idle.map((item) => item.series)}
+              key="idle"
+            />
+          </>
+        )}
+
+        {items.dropped.length > 0 && (
+          <>
+            <h2 className="text-3xl font-bold text-gray-100">Dropped</h2>
+            <Droppable
+              listType={listType}
+              items={items}
+              setItems={setItems}
+              id="dropped"
+              series={items.dropped.map((item) => item.series)}
+              key="dropped"
+            />
+          </>
+        )}
       </div>
     </DndContext>
   );
+};
+
+export const moveBetweenContainers = (
+  items: ItemsState,
+  activeContainer: keyof ItemsState,
+  activeIndex: number,
+  overContainer: keyof ItemsState,
+  overIndex: number,
+  itemId: string
+) => {
+  const itemToMove = items[activeContainer][activeIndex];
+
+  let newItems = {
+    ...items,
+    [activeContainer]: removeAtIndex(items[activeContainer], activeIndex),
+    [overContainer]: insertAtIndex(items[overContainer], overIndex, itemToMove),
+  };
+
+  newItems[overContainer] = newItems[overContainer].map((item, index) => ({
+    ...item,
+    status: overContainer as "watching" | "idle" | "dropped",
+    priority: index + 1, // update the priority to match the index
+  }));
+
+  return newItems;
 };
 
 export default SeriesContainer;

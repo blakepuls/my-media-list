@@ -1,11 +1,48 @@
 import { addSeriesList, removeSeriesList } from "@/utils";
 import { IAnimeResult, IMovieResult, IMangaResult } from "@consumet/extensions";
 import { useState } from "react";
-import { AiFillTrophy, AiFillStar } from "react-icons/ai";
+import {
+  AiFillTrophy,
+  AiFillStar,
+  AiOutlineStop,
+  AiFillEye,
+  AiOutlineCheck,
+} from "react-icons/ai";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 import Skeleton from "../Skeleton";
 import { Database } from "@/types/database.types";
+import { Series } from "@/types/database";
+import { ItemsState, Readlist, Watchlist } from "./SeriesEditor";
+import { moveBetweenContainers } from "./SeriesContainer";
+import { RankModal } from "./RankModal";
+
+function findItemById(
+  items: ItemsState,
+  id: string
+): { container: keyof ItemsState; index: number } | null {
+  for (const container in items) {
+    const index = items[container as keyof ItemsState].findIndex(
+      (item: Watchlist | Readlist) => item.series.id === id
+    );
+    if (index !== -1) {
+      return { container: container as keyof ItemsState, index };
+    }
+  }
+  return null;
+}
+
+export const insertAtIndex = (
+  array: (Watchlist | Readlist)[],
+  index: number,
+  item: Watchlist | Readlist
+): (Watchlist | Readlist)[] => {
+  if (index < 0 || index > array.length) {
+    console.error(`Cannot insert at index ${index}`);
+    return array;
+  }
+  return [...array.slice(0, index), item, ...array.slice(index)];
+};
 
 export function SeriesCardSkeleton() {
   return (
@@ -23,16 +60,46 @@ interface SeriesCardProps {
   series: Database["public"]["Tables"]["series"]["Row"];
   dragging?: boolean;
   style?: React.CSSProperties;
+  listType: "readlist" | "watchlist";
+  // item: Watchlist | Readlist;
+  items: ItemsState;
+  setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
 }
 
 export default function SeriesCard({
   series,
   style,
+  setItems,
+  // item,
+  items,
   dragging: isDragging,
 }: SeriesCardProps) {
+  const [rankModalOpen, setRankModalOpen] = useState(false);
+
+  function moveToContainer(id: string, newContainer: keyof ItemsState) {
+    const itemLocation = findItemById(items, id);
+    if (!itemLocation) {
+      console.error(`Could not find item with id ${id}`);
+      return;
+    }
+    const newItems = moveBetweenContainers(
+      items,
+      itemLocation.container,
+      itemLocation.index,
+      newContainer,
+      items[newContainer].length,
+      id
+    );
+    setItems(newItems);
+  }
+
+  const item = Object.values(items)
+    .flat()
+    .find((s: any) => s?.series?.id == series?.id) as any | undefined;
+
   return (
     <div
-      className={`cursor-pointer relative flex flex-col  rounded-md w-52`}
+      className={`cursor-pointer relative flex flex-col rounded-md w-52 select-none outline-none`}
       style={style}
     >
       <img
@@ -41,32 +108,48 @@ export default function SeriesCard({
         className="w-full h-72 rounded-sm shadow-md object-cover"
       />
       {!isDragging && (
-        <div className="absolute top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
-          {/* {isOnList ? (
+        <div className="absolute outline-none top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+          <button
+            onMouseUp={() => setRankModalOpen(true)}
+            className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+          >
+            <AiOutlineCheck />
+            Complete
+          </button>
+
+          {item?.status != "watching" && (
             <button
-              className="m-2 outline-none flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-              onClick={listRemove}
+              onMouseUp={() => moveToContainer(series.id, "watching")}
+              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
             >
-              <BsFillBookmarkPlusFill className="text-yellow-500" />
-              Remove
+              <AiFillEye />
+              Watching
             </button>
-          ) : (
+          )}
+
+          {item?.status != "idle" && (
             <button
-              className="m-2 flex outline-none items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-              onClick={listAdd}
+              onMouseUp={() => moveToContainer(series.id, "idle")}
+              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
             >
               <BsFillBookmarkPlusFill />
-              {["movie", "tv"].includes(type) ? "Watchlist" : "Readlist"}
+              Watchlist
             </button>
-          )} */}
-          <button className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1">
-            <AiFillTrophy />
-            Rank
-          </button>
+          )}
+
+          {item?.status != "dropped" && (
+            <button
+              onMouseUp={() => moveToContainer(series.id, "dropped")}
+              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
+            >
+              <AiOutlineStop />
+              Dropped
+            </button>
+          )}
         </div>
       )}
 
-      <div className="flex flex-col gap-0.5 overflow-hidden h-14 p-1">
+      <div className="flex flex-col gap-0.5 overflow-hidden h-14 p-1 pb-0">
         <h1 className="whitespace-nowrap text-left font-semibold overflow-hidden">
           {series.title.toString()}
         </h1>
@@ -84,11 +167,12 @@ export default function SeriesCard({
             </>
           )}
 
-          {typeof series.rating == "number" && (
-            <Rating rating={series.rating} />
-          )}
+          <Rating
+            rating={typeof series.rating == "number" ? series.rating : 0}
+          />
         </section>
       </div>
+      <RankModal isOpen={rankModalOpen} setOpen={setRankModalOpen} />
     </div>
   );
 }
@@ -108,7 +192,7 @@ const Rating = ({ rating }: RatingProps) => {
   return (
     <div className="ml-auto flex items-center gap-0.5  text-white bg-opacity-80 rounded-md">
       <AiFillStar className="text-yellow-500" />
-      <span className="text-yellow-500">{rating}</span>
+      <span className="text-yellow-500">{rating == 0 ? "?" : rating}</span>
     </div>
   );
 };

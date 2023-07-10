@@ -80,10 +80,11 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
       !movie.image.includes("originalundefined")
   );
 
-  // Remove 2nd decimal place from rating
+  // Remove 2nd decimal place from rating, and check
   movies.results = movies.results.map((movie: any) => {
     movie.rating = Math.floor(movie.rating * 10) / 10;
     if (movie.rating === 0) movie.rating = null;
+    if (movie.releaseDate == "NaN") movie.releaseDate = null;
     return movie;
   });
 

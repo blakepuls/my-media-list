@@ -3,10 +3,14 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import SeriesCard from "./SeriesCard";
 import { Series } from "@/types/database";
+import { ItemsState, Readlist, Watchlist } from "./SeriesEditor";
 
 interface SortableItemProps {
   id: string;
   series: Series;
+  items: ItemsState;
+  setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
+  listType: "readlist" | "watchlist";
 }
 
 export const SortableItem = (props: SortableItemProps) => {
@@ -22,11 +26,15 @@ export const SortableItem = (props: SortableItemProps) => {
     <div
       style={itemStyle as any}
       ref={setNodeRef}
-      className="bg-gray-950 p-3 rounded-md shadow-md"
       {...attributes}
       {...listeners}
     >
-      <SeriesCard series={props.series} />
+      <SeriesCard
+        listType={props.listType}
+        items={props.items}
+        setItems={props.setItems}
+        series={props.series}
+      />
     </div>
   );
 };

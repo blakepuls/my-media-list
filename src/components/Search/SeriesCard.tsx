@@ -127,9 +127,9 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
             </>
           )}
 
-          {typeof result.rating == "number" && (
-            <Rating rating={result.rating} type={type} />
-          )}
+          <Rating
+            rating={typeof result.rating == "number" ? result.rating : 0}
+          />
         </section>
       </div>
     </div>
@@ -138,19 +138,13 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
 
 interface RatingProps {
   rating: number;
-  type: "Movie" | "Anime" | "Manga";
 }
 
-interface RatingProps {
-  rating: number;
-  type: "Movie" | "Anime" | "Manga";
-}
-
-const Rating = ({ rating, type }: RatingProps) => {
+const Rating = ({ rating }: RatingProps) => {
   return (
     <div className="ml-auto flex items-center gap-0.5  text-white bg-opacity-80 rounded-md">
       <AiFillStar className="text-yellow-500" />
-      <span className="text-yellow-500">{rating}</span>
+      <span className="text-yellow-500">{rating == 0 ? "?" : rating}</span>
     </div>
   );
 };

@@ -41,8 +41,8 @@ export default async function Watchlist({
 
   return (
     <main className="flex flex-col items-center gap-3 mt-10 w-full">
-      <section className="flex flex-wrap gap-5">
-        <SeriesEditor list={watchlist} />
+      <section className="flex flex-wrap gap-5 w-full">
+        <SeriesEditor list={watchlist} listType="watchlist" />
       </section>
     </main>
   );

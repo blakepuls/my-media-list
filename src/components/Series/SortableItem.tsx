@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import SeriesCard from "./SeriesCard";
@@ -14,8 +14,10 @@ interface SortableItemProps {
 }
 
 export const SortableItem = (props: SortableItemProps) => {
+  const [rankModalOpen, setRankModalOpen] = useState(false);
+
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+    useSortable({ id: props.id, disabled: rankModalOpen });
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -30,6 +32,8 @@ export const SortableItem = (props: SortableItemProps) => {
       {...listeners}
     >
       <SeriesCard
+        setRankModalOpen={setRankModalOpen}
+        rankModalOpen={rankModalOpen}
         listType={props.listType}
         items={props.items}
         setItems={props.setItems}

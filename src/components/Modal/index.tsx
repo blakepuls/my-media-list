@@ -29,7 +29,7 @@ export default function Modal({
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Add Server"
-      className={`bg-gray-800 rounded-md p-2`}
+      className={` rounded-md`}
       overlayClassName={
         overlayClassName ||
         "ReactModal__Overlay ReactModal__Overlay--after-open ReactModal__Overlay--before-close fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
@@ -42,7 +42,7 @@ export default function Modal({
         className={
           className
             ? `${className} modal-content ${contentAnimationClass}`
-            : `bg-gray-800 flex flex-col gap-3 outline-none rounded-md p-2 m-auto items-center justify-center modal-content ${contentAnimationClass}`
+            : ` flex flex-col gap-3 outline-none rounded-md m-auto items-center justify-center modal-content ${contentAnimationClass}`
         }
       >
         {children}

@@ -44,6 +44,6 @@
     "@types/react-dnd": "^3.0.2",
     "@types/react-modal": "^3.16.0",
     "@types/react-transition-group": "^4.4.6",
-    "supabase": "^1.75.3"
+    "supabase": "^1.77.5"
   }
 }

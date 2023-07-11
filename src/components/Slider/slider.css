@@ -1,0 +1,12 @@
+.slider {
+  @apply outline-none shadow-md appearance-none accent-primary-500 w-full h-5 bg-gray-700 rounded;
+}
+
+.slider::-webkit-slider-thumb {
+  @apply shadow-lg appearance-none h-7 w-3 bg-primary-500 rounded-md cursor-pointer transition-all;
+  @apply active:h-8 active:w-4 active:shadow-lg;
+}
+
+.slider::-moz-range-thumb {
+  @apply shadow-lg h-6 w-6 bg-primary-500 rounded-full cursor-pointer;
+}

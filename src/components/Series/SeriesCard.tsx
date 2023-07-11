@@ -61,6 +61,8 @@ interface SeriesCardProps {
   dragging?: boolean;
   style?: React.CSSProperties;
   listType: "readlist" | "watchlist";
+  rankModalOpen: boolean;
+  setRankModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   // item: Watchlist | Readlist;
   items: ItemsState;
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
@@ -70,12 +72,12 @@ export default function SeriesCard({
   series,
   style,
   setItems,
+  rankModalOpen,
+  setRankModalOpen,
   // item,
   items,
   dragging: isDragging,
 }: SeriesCardProps) {
-  const [rankModalOpen, setRankModalOpen] = useState(false);
-
   function moveToContainer(id: string, newContainer: keyof ItemsState) {
     const itemLocation = findItemById(items, id);
     if (!itemLocation) {
@@ -172,7 +174,13 @@ export default function SeriesCard({
           />
         </section>
       </div>
-      <RankModal isOpen={rankModalOpen} setOpen={setRankModalOpen} />
+
+      <RankModal
+        series={series}
+        isOpen={rankModalOpen}
+        setOpen={setRankModalOpen}
+        onSubmit={(e) => console.log(e)}
+      />
     </div>
   );
 }

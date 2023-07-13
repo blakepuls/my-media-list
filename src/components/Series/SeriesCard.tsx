@@ -15,7 +15,8 @@ import { Database } from "@/types/database.types";
 import { Series } from "@/types/database";
 import { ItemsState, Readlist, Watchlist } from "./SeriesEditor";
 import { moveBetweenContainers } from "./SeriesContainer";
-import { RankModal } from "./RankModal";
+import { RankModal } from "../Ranking/RankModal";
+import RatingNumber from "../RatingNumber";
 
 function findItemById(
   items: ItemsState,
@@ -169,9 +170,11 @@ export default function SeriesCard({
             </>
           )}
 
-          <Rating
-            rating={typeof series.rating == "number" ? series.rating : 0}
-          />
+          <div className="ml-auto">
+            <RatingNumber
+              rating={typeof series.rating == "number" ? series.rating : 0}
+            />
+          </div>
         </section>
       </div>
 
@@ -191,16 +194,3 @@ function formatType(type: "movie" | "tv" | "manga") {
   if (type == "tv") return "TV Series";
   if (type == "manga") return "Manga";
 }
-
-interface RatingProps {
-  rating: number;
-}
-
-const Rating = ({ rating }: RatingProps) => {
-  return (
-    <div className="ml-auto flex items-center gap-0.5  text-white bg-opacity-80 rounded-md">
-      <AiFillStar className="text-yellow-500" />
-      <span className="text-yellow-500">{rating == 0 ? "?" : rating}</span>
-    </div>
-  );
-};

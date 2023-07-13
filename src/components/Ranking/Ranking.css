@@ -1,0 +1,11 @@
+.rankBackground {
+  background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(75, 85, 99, 1)
+    ),
+    url("/path/to/your/image.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}

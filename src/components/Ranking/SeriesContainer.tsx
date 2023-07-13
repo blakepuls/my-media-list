@@ -15,16 +15,16 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import SeriesCard from "./SeriesCard";
 import { Database } from "@/types/database.types";
 import { CSS } from "@dnd-kit/utilities";
 import { SortableItem } from "./SortableItem";
 import Droppable from "./Droppable";
 
-import { arrayMove, insertAtIndex, removeAtIndex } from "../../utils/array";
-import { ItemsState, Readlist, Watchlist } from "./SeriesEditor";
+import { arrayMove, insertAtIndex, removeAtIndex } from "@/utils/array";
+import { ItemsState, RankingData } from "./RankingEditor";
+import { Ranking, RankingTiers, Series } from "@/types/database";
 
-type Series = Database["public"]["Tables"]["series"]["Row"];
+// type Ranking = Database["public"]["Tables"]["series"]["Row"];
 
 interface SeriesRowProps {
   // series: Array<Series>;
@@ -34,15 +34,13 @@ interface SeriesRowProps {
 }
 
 interface SeriesContainerProps {
-  list: Watchlist[] | Readlist[];
-  listType: "watchlist" | "readlist";
+  list: RankingData[];
   items: ItemsState;
 
   setItems: Dispatch<SetStateAction<ItemsState>>;
 }
 
 const SeriesContainer: React.FC<SeriesContainerProps> = ({
-  listType,
   list,
   items,
   setItems,
@@ -73,14 +71,14 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
           newItems = {
             ...items,
             [overContainer]: arrayMove(
-              items[overContainer as "watching" | "idle" | "dropped"],
+              items[overContainer as RankingTiers],
               activeIndex,
               overIndex
             ),
           };
           // Update the priority of each item in the overContainer to match its index
-          newItems[overContainer as "watching" | "idle" | "dropped"] = newItems[
-            overContainer as "watching" | "idle" | "dropped"
+          newItems[overContainer as RankingTiers] = newItems[
+            overContainer as RankingTiers
           ].map((item, index) => ({
             ...item,
             priority: index + 1, // since priority starts from 1
@@ -110,52 +108,22 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
     >
-      <div className="flex flex-col gap-5  p-3">
-        {items.watching.length > 0 && (
-          <>
-            <h2 className="text-3xl font-bold text-gray-100">
-              Currently {listType == "watchlist" ? "Watching" : "Reading"}
-            </h2>
-            <Droppable
-              listType={listType}
-              items={items}
-              setItems={setItems}
-              id="watching"
-              series={items.watching.map((item) => item.series)}
-              key="watching"
-            />
-          </>
-        )}
-
-        {items.idle.length > 0 && (
-          <>
-            <h2 className="text-3xl font-bold text-gray-100">
-              {listType == "watchlist" ? "Watchlist" : "Readlist"}
-            </h2>
-            <Droppable
-              listType={listType}
-              items={items}
-              setItems={setItems}
-              id="idle"
-              series={items.idle.map((item) => item.series)}
-              key="idle"
-            />
-          </>
-        )}
-
-        {items.dropped.length > 0 && (
-          <>
-            <h2 className="text-3xl font-bold text-gray-100">Dropped</h2>
-            <Droppable
-              listType={listType}
-              items={items}
-              setItems={setItems}
-              id="dropped"
-              series={items.dropped.map((item) => item.series)}
-              key="dropped"
-            />
-          </>
-        )}
+      <div className="flex flex-col gap-5  p-3 w-full">
+        {Object.keys(items).map((key) => {
+          return (
+            <div key={key} className="flex flex-col gap-5 w-full ">
+              <h2 className="text-3xl font-bold text-gray-100">{key}</h2>
+              <Droppable
+                items={items}
+                setItems={setItems}
+                id={key}
+                rankings={items[key as RankingTiers]}
+                // series={items[key as RankingTiers].map((item) => item.series)}
+                key={key}
+              />
+            </div>
+          );
+        })}
       </div>
     </DndContext>
   );
@@ -179,7 +147,7 @@ export const moveBetweenContainers = (
 
   newItems[overContainer] = newItems[overContainer].map((item, index) => ({
     ...item,
-    status: overContainer as "watching" | "idle" | "dropped",
+    status: overContainer as RankingTiers,
     priority: index + 1, // update the priority to match the index
   }));
 

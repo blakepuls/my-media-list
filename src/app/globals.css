@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer components {
+  .shadow-glow {
+    @apply relative;
+  }
+  .shadow-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at top right,
+      rgb(0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.6) 20%,
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+
   .btn-primary {
     @apply bg-primary-500 text-white shadow-md rounded-md hover:-translate-y-0.5 hover:shadow-lg transition duration-300 p-2.5;
     @apply active:translate-y-0 active:shadow-none;

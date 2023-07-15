@@ -11,15 +11,18 @@ import {
 } from "@dnd-kit/sortable";
 import Test from "../Test";
 import supabase from "@/utils/supabase-browser";
+import { Ranking } from "@/types/database";
 
 type Series = Database["public"]["Tables"]["series"]["Row"];
 export type Watchlist =
   Database["public"]["Tables"]["profile_watchlists"]["Row"] & {
     series: Series;
+    ranking: Ranking;
   };
 export type Readlist =
   Database["public"]["Tables"]["profile_readlists"]["Row"] & {
     series: Series;
+    ranking: Ranking;
   };
 
 export interface ItemsState {
@@ -36,13 +39,13 @@ interface SeriesEditorProps {
 export default function SeriesEditor({ list, listType }: SeriesEditorProps) {
   const [items, setItems] = useState<ItemsState>({
     watching: list
-      .filter((item) => item.status === "watching")
+      ?.filter((item) => item.status === "watching")
       .sort((a, b) => a.priority - b.priority),
     idle: list
-      .filter((item) => item.status === "idle")
+      ?.filter((item) => item.status === "idle")
       .sort((a, b) => a.priority - b.priority),
     dropped: list
-      .filter((item) => item.status === "dropped")
+      ?.filter((item) => item.status === "dropped")
       .sort((a, b) => a.priority - b.priority),
   });
 
@@ -55,12 +58,12 @@ export default function SeriesEditor({ list, listType }: SeriesEditorProps) {
     }
 
     // Set a new timeout
-    updateTimeout.current = setTimeout(() => {
+    updateTimeout.current = setTimeout(async () => {
       // Map the items to the correct format
       const itemsData = Object.entries(items).map(
         ([status, containerItems]) => {
           return containerItems.map((item: any) => {
-            const { series, ...rest } = item; // Here, we are excluding the `series` property by destructuring it separately
+            const { ranking, series, ...rest } = item; // Here, we are excluding the `series` property by destructuring it separately
             return rest;
           });
         }
@@ -70,10 +73,12 @@ export default function SeriesEditor({ list, listType }: SeriesEditorProps) {
       const flattenedItemsData = itemsData.flat();
       console.log("itemsData", flattenedItemsData);
 
-      supabase
+      const test = await supabase
         .from(`profile_${listType}s`)
-        .upsert(flattenedItemsData)
-        .then(console.log);
+        .upsert(flattenedItemsData);
+      // .then(console.log);
+
+      console.log("test", test);
     }, 3000);
 
     // Clear the timeout when the component unmounts
@@ -81,6 +86,8 @@ export default function SeriesEditor({ list, listType }: SeriesEditorProps) {
       if (updateTimeout.current) clearTimeout(updateTimeout.current);
     };
   }, [items]);
+
+  // if (!list) return null;
 
   return (
     <SeriesContainer

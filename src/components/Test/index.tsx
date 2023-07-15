@@ -15,7 +15,7 @@ interface TestProps {
 
 export default function Test({ data }: TestProps) {
   return (
-    <button className="btn-primary " onClick={() => console.log(data)}>
+    <button className="btn-primary " onMouseDown={() => console.log(data)}>
       Test
     </button>
   );

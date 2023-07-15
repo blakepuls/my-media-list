@@ -1,3 +1,3 @@
-export * from "./serieslist";
+export * from "./series";
 export * from "./supabase-browser";
 // export * from "./series";

@@ -12,10 +12,10 @@ import { AiFillStar } from "react-icons/ai";
 // Revalidate on every request
 export const revalidate = 0;
 
-type TSeries = Database["public"]["Tables"]["series"]["Row"];
-type TWatchlist = (Database["public"]["Tables"]["profile_watchlists"]["Row"] & {
-  series: TSeries;
-})[];
+// type TSeries = Database["public"]["Tables"]["series"]["Row"];
+// type TWatchlist = (Database["public"]["Tables"]["profile_watchlists"]["Row"] & {
+//   series: TSeries;
+// })[];
 
 export default async function Watchlist({
   params,
@@ -34,14 +34,15 @@ export default async function Watchlist({
   // Select every watchlist row that belongs to the user
   const { data: readlistData } = await supabase
     .from("profile_readlists")
-    .select("*, series:series_id(*)")
+    .select("*, series:series_id(*), ranking:ranking_id(*)")
     .eq("profile_id", profile?.id);
 
-  const readlist = readlistData as unknown as TWatchlist;
+  const readlist = readlistData as any;
 
   return (
     <main className="flex flex-col items-center gap-3 mt-10 w-full">
       <section className="flex flex-wrap gap-5 w-full">
+        {/* <Test data={readlistData} /> */}
         <SeriesEditor list={readlist} listType="readlist" />
       </section>
     </main>

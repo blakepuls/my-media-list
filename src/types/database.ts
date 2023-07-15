@@ -1,9 +1,16 @@
 import { Database } from "./database.types";
 
-export type Series = Database["public"]["Tables"]["series"]["Row"];
-export type Watchlist =
-  Database["public"]["Tables"]["profile_watchlists"]["Row"];
-export type Readlist = Database["public"]["Tables"]["profile_readlists"]["Row"];
-// export type Rankings = Database["public"]["Tables"]["profile_rankings"]["Row"];
-export type Ranking = Database["public"]["Tables"]["profile_rankings"]["Row"];
+type Tables = Database["public"]["Tables"];
+
+export type Series = Tables["series"]["Row"];
+export type SeriesWithRankings = Tables["series"]["Row"] & {
+  ranking: Ranking;
+};
+export type Watchlist = Tables["profile_watchlists"]["Row"];
+export type Readlist = Tables["profile_readlists"]["Row"];
+export type Ranking = Tables["profile_rankings"]["Row"];
+export type RankingUpdate = Tables["profile_rankings"]["Update"];
+export type RankingInsert = Tables["profile_rankings"]["Insert"];
 export type RankingTiers = Database["public"]["Enums"]["ranking_tiers"];
+export type SeriesListStatus =
+  Database["public"]["Enums"]["series_list_status_enum"];

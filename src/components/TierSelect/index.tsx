@@ -1,8 +1,8 @@
-import { Rankings } from "@/types/database";
+import { RankingTiers } from "@/types/database";
 
 interface TierSelectProps {
-  setTier: React.Dispatch<React.SetStateAction<Rankings["tier"]>>;
-  tier: Rankings["tier"];
+  setTier: React.Dispatch<React.SetStateAction<RankingTiers>>;
+  tier: RankingTiers;
 }
 
 export function TierSelect({ tier, setTier }: TierSelectProps) {
@@ -18,7 +18,7 @@ export function TierSelect({ tier, setTier }: TierSelectProps) {
 
   return (
     <div
-      className={`relative flex gap-3 items-center bg-gray-900 w-[5.5rem] rounded-md shadow-md  cursor-pointer select-none`}
+      className={`relative flex gap-3 items-center bg-gray-900 w-[5.6rem] rounded-md shadow-md  cursor-pointer select-none`}
       onMouseDown={nextTier}
     >
       <h1 className="text-xl ml-3">Tier</h1>
@@ -33,7 +33,7 @@ export function TierSelect({ tier, setTier }: TierSelectProps) {
 
 interface Tier {
   color: string;
-  letter: Rankings["tier"];
+  letter: RankingTiers;
 }
 
 export const Tiers: Record<string, Tier> = {

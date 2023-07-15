@@ -2,7 +2,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import SortableItem from "./SortableItem";
 import React from "react";
-import { Series } from "@/types/database";
+import { Series, SeriesListStatus } from "@/types/database";
 import { ItemsState } from "./SeriesEditor";
 
 interface DroppableProps {
@@ -11,6 +11,7 @@ interface DroppableProps {
   items: ItemsState;
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
   listType: "readlist" | "watchlist";
+  status: SeriesListStatus;
 }
 
 const Droppable = ({
@@ -19,6 +20,7 @@ const Droppable = ({
   series,
   setItems,
   items,
+  status,
 }: DroppableProps) => {
   const { setNodeRef } = useDroppable({ id });
 

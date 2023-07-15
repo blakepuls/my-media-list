@@ -34,10 +34,10 @@ export default async function Watchlist({
   // Select every watchlist row that belongs to the user
   const { data: watchlistData } = await supabase
     .from("profile_watchlists")
-    .select("*, series:series_id(*)")
+    .select("*, series:series_id(*), ranking:ranking_id(*)")
     .eq("profile_id", profile?.id);
 
-  const watchlist = watchlistData as unknown as TWatchlist;
+  const watchlist = watchlistData as any;
 
   return (
     <main className="flex flex-col items-center gap-3 mt-10 w-full">

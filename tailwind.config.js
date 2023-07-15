@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "shadow-gradient":
+          "radial-gradient(circle at top right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0))",
       },
       colors: {
         primary: {

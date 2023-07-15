@@ -13,7 +13,9 @@ const ProgressBar: React.FC<ProgressProps> = ({ progress }) => {
     <div className="relative bg-gray-900 h-4 overflow-hidden">
       <div
         style={progressStyle}
-        className="h-full absolute shadow-md bg-gradient-to-r rounded-b-sm from-primary-500 to-primary-900"
+        className={`h-full absolute shadow-md bg-gradient-to-r rounded-b-sm from-primary-500 to-primary-900 ${
+          progress < 100 && "rounded-r-sm"
+        }`}
       />
     </div>
   );

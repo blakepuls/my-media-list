@@ -29,10 +29,10 @@ export default function Modal({
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Add Server"
-      className={` rounded-md`}
+      className={`z-50 rounded-md`}
       overlayClassName={
         overlayClassName ||
-        "ReactModal__Overlay ReactModal__Overlay--after-open ReactModal__Overlay--before-close fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        "ReactModal__Overlay z-50 ReactModal__Overlay--after-open ReactModal__Overlay--before-close fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
       }
       shouldCloseOnEsc={shouldCloseOnEsc ?? true}
       shouldCloseOnOverlayClick={shouldCloseOnOverlayClick ?? true}

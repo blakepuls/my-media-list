@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Series } from "@/types/database";
+import { Ranking, Series } from "@/types/database";
 import { ItemsState, RankingData } from "./RankingEditor";
 import "./Ranking.css";
 import { Tiers } from "../TierSelect";
@@ -10,6 +10,7 @@ import { AiFillStar, AiOutlineEye } from "react-icons/ai";
 import ProgressBar from "../Progress";
 import { BsThreeDots } from "react-icons/bs";
 import { RankModal } from "./RankModal";
+
 interface RankingItemProps {
   id: string;
   rank: RankingData;
@@ -17,7 +18,12 @@ interface RankingItemProps {
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
 }
 
-export const Ranking = ({ id, rank }: RankingItemProps) => {
+export const RankingItem = ({
+  id,
+  rank,
+  items,
+  setItems,
+}: RankingItemProps) => {
   const [rankModalOpen, setRankModalOpen] = useState(false);
   const tier = Tiers[rank.tier];
 
@@ -25,12 +31,32 @@ export const Ranking = ({ id, rank }: RankingItemProps) => {
     setRankModalOpen(true);
   }
 
+  function onSubmit(updatedRanking: Ranking) {
+    setItems((prevItems) => {
+      // Create a deep copy of the previous state
+      let newState = JSON.parse(JSON.stringify(prevItems));
+
+      // Remove old ranking from its tier
+      newState[rank.tier] = newState[rank.tier].filter(
+        (item: any) => item.id !== rank.id
+      );
+
+      // Add the updated ranking to its new tier
+      newState[updatedRanking.tier] = [
+        ...newState[updatedRanking.tier],
+        updatedRanking,
+      ];
+
+      return newState;
+    });
+  }
+
   return (
     <div className="w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900">
       <RankModal
         isOpen={rankModalOpen}
         setOpen={setRankModalOpen}
-        onSubmit={() => {}}
+        onSubmit={onSubmit}
         series={rank.series}
         ranking={rank}
         // onClose={() => setRankModalOpen(false)}
@@ -39,10 +65,13 @@ export const Ranking = ({ id, rank }: RankingItemProps) => {
         <img
           src={rank.series.banner || ""}
           alt={rank.series.title}
-          className="w-full h-28 object-cover opacity-40 "
+          className="w-full h-28 object-cover opacity-40"
         />
-        <img src={rank.series.image} className="w-28 absolute top-5 left-5" />
-        <section className="absolute bottom-0 left-0 ml-[9.25rem] w-auto flex ">
+        <img
+          src={rank.series.image}
+          className="w-28 z-10 absolute top-3 left-3 rounded-sm shadow-md"
+        />
+        <section className="absolute bottom-0 left-0 ml-[8.5rem] w-auto flex ">
           <h1 className=" text-2xl font-bold text-white">
             {rank.series.title}
           </h1>
@@ -52,9 +81,9 @@ export const Ranking = ({ id, rank }: RankingItemProps) => {
           className="absolute top-1 right-3 text-white text-3xl transition hover:text-primary-500"
         />
       </section>
-      <section className="bg-gray-900 h-[5.5rem] w-full ">
+      <section className="bg-gray-900 h-[5.05rem] w-full ">
         <div className="absolute top-5 left-5 flex"></div>
-        <section className="ml-[8.3rem] p-4 flex gap-3 ">
+        <section className="ml-[7.75rem] p-3 flex gap-3 ">
           <h1
             className={`text-2xl w-7 text-center rounded-sm p-1 font-bold text-white ${tier.color}`}
           >
@@ -72,9 +101,11 @@ export const Ranking = ({ id, rank }: RankingItemProps) => {
           </div>
         </section>
       </section>
-      <ProgressBar progress={rank.progress} />
+      <div className="absolute bottom-0 w-full">
+        <ProgressBar progress={rank.progress} />
+      </div>
     </div>
   );
 };
 
-export default Ranking;
+export default RankingItem;

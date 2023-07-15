@@ -117,6 +117,7 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
               Currently {listType == "watchlist" ? "Watching" : "Reading"}
             </h2>
             <Droppable
+              status="watching"
               listType={listType}
               items={items}
               setItems={setItems}
@@ -133,6 +134,7 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
               {listType == "watchlist" ? "Watchlist" : "Readlist"}
             </h2>
             <Droppable
+              status="idle"
               listType={listType}
               items={items}
               setItems={setItems}
@@ -147,6 +149,7 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
           <>
             <h2 className="text-3xl font-bold text-gray-100">Dropped</h2>
             <Droppable
+              status="dropped"
               listType={listType}
               items={items}
               setItems={setItems}

@@ -6,6 +6,9 @@ import { TierSelect, Tiers } from "../../TierSelect";
 import supabase from "@/utils/supabase-browser";
 import { toast } from "react-toastify";
 import Counter from "@/components/Counter";
+import { updateRanking } from "@/utils/rankings";
+import { AiFillEye, AiOutlineCheck, AiOutlineStop } from "react-icons/ai";
+import { BsFillBookmarkPlusFill } from "react-icons/bs";
 
 export interface RankingResult {
   tier: Ranking["tier"];
@@ -16,38 +19,14 @@ export interface RankingResult {
 }
 
 interface RankModalProps {
-  // tier?: Ranking["tier"];
-  // rating?: number;
+  fromList?: boolean;
+  onComplete?: (result: RankingResult) => void;
+
   ranking?: Ranking;
   series: Series;
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (SubmitResponse: RankingResult) => void;
-}
-
-async function updateRanking(
-  seriesId: string,
-  { rating, tier, tier_rank }: RankingResult
-) {
-  const { data: userData } = await supabase.auth.getUser();
-
-  if (!userData.user) return;
-
-  const { data, error } = await supabase
-    .from("profile_rankings")
-    .upsert({
-      profile_id: userData.user.id,
-      series_id: seriesId,
-      tier,
-      rating,
-      tier_rank: 0,
-    })
-    .eq("series_id", seriesId)
-    .eq("profile_id", userData.user.id);
-
-  if (error) {
-    throw error;
-  }
+  onSubmit: (SubmitResponse: Ranking) => void;
 }
 
 export function RankModal({
@@ -60,17 +39,18 @@ export function RankModal({
   const [tier, setTier] = useState<Ranking["tier"]>(ranking?.tier || "S");
   const [rating, setRating] = useState(ranking?.rating || 5);
   const [watch_count, setWatchCount] = useState(ranking?.watch_count || 1);
+  const [progress, setProgress] = useState(ranking?.progress || 1);
 
   async function submit() {
     if (onSubmit) {
       toast
         .promise(
           updateRanking(series.id, {
+            ...ranking,
             rating,
             tier,
             watch_count,
-            tier_rank: 0,
-            progress: 0,
+            progress,
           }),
           {
             pending: "Adding to rankings...",
@@ -83,7 +63,7 @@ export function RankModal({
           }
         )
         .then((data) => {
-          onSubmit({ tier, rating, tier_rank: 0, watch_count, progress: 0 });
+          onSubmit(data as any);
           setOpen(false);
         })
         .catch(() => {});
@@ -110,6 +90,14 @@ export function RankModal({
         <div className="flex flex-col gap-3 flex-grow p-3 w-80">
           <h1 className="font-bold text-xl">{series.title}</h1>
           <Slider
+            label="Progress"
+            min={0}
+            max={100}
+            step={1}
+            initialValue={progress}
+            onChange={setProgress}
+          />
+          <Slider
             label="Overall Rating"
             min={0}
             max={10}
@@ -121,7 +109,24 @@ export function RankModal({
             <TierSelect setTier={setTier} tier={tier} />
             <Counter onChange={setWatchCount} value={watch_count} />
           </section>
-          <div className="mt-auto flex gap-3 w-full ml-auto">
+          <section className="mt-auto flex justify-between ">
+            <button
+              // onMouseUp={() => moveToContainer(series.id, "dropped")}
+              className="flex items-center gap-1 rounded-md hover:text-red-400 transition-colors p-1"
+            >
+              <AiOutlineStop />
+              Drop
+            </button>
+            <button className=" flex items-center gap-1 rounded-md hover:text-yellow-500 transition-colors p-1">
+              <BsFillBookmarkPlusFill />
+              Watchlist
+            </button>
+            <button className="flex items-center gap-1 rounded-md hover:text-primary-400 transition-colors p-1">
+              <AiOutlineCheck />
+              Complete
+            </button>
+          </section>
+          <div className=" flex gap-3 w-full ml-auto">
             <button
               className="btn-secondary w-1/3"
               onMouseDown={() => setOpen(false)}

@@ -11,7 +11,6 @@ interface DroppableProps {
   items: ItemsState;
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
   listType: "readlist" | "watchlist";
-  status: SeriesListStatus;
 }
 
 const Droppable = ({
@@ -20,7 +19,6 @@ const Droppable = ({
   series,
   setItems,
   items,
-  status,
 }: DroppableProps) => {
   const { setNodeRef } = useDroppable({ id });
 
@@ -28,10 +26,11 @@ const Droppable = ({
     <SortableContext id={id} items={series} strategy={rectSortingStrategy}>
       <div
         ref={setNodeRef}
-        className="rounded-md flex gap-3 w-full min-h-[20rem] flex-wrap"
+        className="rounded-md flex gap-3 w-full min-h-[11.5rem] flex-wrap"
       >
         {series.map((item) => (
           <SortableItem
+            container={id as SeriesListStatus}
             listType={listType}
             items={items}
             setItems={setItems}

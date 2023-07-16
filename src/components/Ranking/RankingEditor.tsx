@@ -3,6 +3,8 @@
 import SeriesContainer from "./SeriesContainer";
 import { useEffect, useRef, useState } from "react";
 import { Ranking, Series } from "@/types/database";
+import Test from "../Test";
+import supabase from "@/utils/supabase-browser";
 
 export type RankingData = Ranking & {
   series: Series;
@@ -51,12 +53,12 @@ export default function RankingEditor({ list }: SeriesEditorProps) {
     }
 
     // Set a new timeout
-    updateTimeout.current = setTimeout(() => {
+    updateTimeout.current = setTimeout(async () => {
       // Map the items to the correct format
       const itemsData = Object.entries(items).map(
         ([status, containerItems]) => {
           return containerItems.map((item: any) => {
-            const { series, ...rest } = item; // Here, we are excluding the `series` property by destructuring it separately
+            const { priority, series, ...rest } = item; // Here, we are excluding the `series` property by destructuring it separately
             return rest;
           });
         }
@@ -66,10 +68,11 @@ export default function RankingEditor({ list }: SeriesEditorProps) {
       const flattenedItemsData = itemsData.flat();
       console.log("itemsData", flattenedItemsData);
 
-      // supabase
-      //   .from(`profile_${listType}s`)
-      //   .upsert(flattenedItemsData)
-      //   .then(console.log);
+      console.log("flat", flattenedItemsData);
+
+      const test = await supabase
+        .from(`profile_rankings`)
+        .upsert(flattenedItemsData);
     }, 3000);
 
     // Clear the timeout when the component unmounts
@@ -78,5 +81,10 @@ export default function RankingEditor({ list }: SeriesEditorProps) {
     };
   }, [items]);
 
-  return <SeriesContainer items={items} setItems={setItems} list={list} />;
+  return (
+    <>
+      <Test data={items} />
+      <SeriesContainer items={items} setItems={setItems} list={list} />;
+    </>
+  );
 }

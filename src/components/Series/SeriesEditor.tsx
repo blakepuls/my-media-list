@@ -71,14 +71,9 @@ export default function SeriesEditor({ list, listType }: SeriesEditorProps) {
 
       // Merge arrays into a single one
       const flattenedItemsData = itemsData.flat();
-      console.log("itemsData", flattenedItemsData);
 
-      const test = await supabase
-        .from(`profile_${listType}s`)
-        .upsert(flattenedItemsData);
+      await supabase.from(`profile_${listType}s`).upsert(flattenedItemsData);
       // .then(console.log);
-
-      console.log("test", test);
     }, 3000);
 
     // Clear the timeout when the component unmounts

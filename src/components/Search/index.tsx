@@ -226,7 +226,7 @@ export default function Search(props: SearchProps) {
 
   return (
     <div
-      className="flex items-center gap-1.5 p-1.5 bg-gray-700 h-10 rounded-md text-sm shadow-md cursor-text"
+      className="flex w-80 items-center gap-1.5 p-1.5 bg-gray-700 h-10 rounded-md text-sm shadow-md cursor-text"
       onClick={handleFocus}
     >
       <AiOutlineSearch className="text-2xl text-gray-500" />

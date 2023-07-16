@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Ranking, Series } from "@/types/database";
@@ -15,7 +15,7 @@ import {
 } from "react-icons/ai";
 import ProgressBar from "../Progress";
 import { BsThreeDots } from "react-icons/bs";
-import { RankModal } from "../Ranking/RankModal";
+import { RankModal, RankingResult } from "../Ranking/RankModal";
 import ThreeDots from "../ThreeDots";
 // import { RankModal } from "./RankModal";
 
@@ -24,6 +24,10 @@ interface RichSeriesCardProps {
   ranking?: Ranking;
   series: Series;
   onSubmit: (updatedRanking: Ranking) => void;
+  onComplete?: (result: RankingResult) => void;
+  onWatchlist?: (result: RankingResult) => void;
+  onDrop?: (result: RankingResult) => void;
+  setModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const RichSeriesCard = ({
@@ -31,33 +35,21 @@ export const RichSeriesCard = ({
   series,
   ranking,
   onSubmit,
+  onComplete,
+  onWatchlist,
+  setModalOpen,
+  onDrop,
 }: RichSeriesCardProps) => {
   const [rankModalOpen, setRankModalOpen] = useState(false);
   const tier = Tiers[ranking?.tier || "S"];
 
+  useEffect(() => {
+    setModalOpen && setModalOpen(rankModalOpen);
+  }, [rankModalOpen]);
+
   function editRanking() {
     setRankModalOpen(true);
   }
-
-  // function onSubmit(updatedRanking: Ranking) {
-  //   setItems((prevItems) => {
-  //     // Create a deep copy of the previous state
-  //     let newState = JSON.parse(JSON.stringify(prevItems));
-
-  //     // Remove old ranking from its tier
-  //     newState[ranking.tier] = newState[ranking.tier].filter(
-  //       (item: any) => item.id !== ranking.id
-  //     );
-
-  //     // Add the updated ranking to its new tier
-  //     newState[updatedRanking.tier] = [
-  //       ...newState[updatedRanking.tier],
-  //       updatedRanking,
-  //     ];
-
-  //     return newState;
-  //   });
-  // }
 
   return (
     <div className="w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900 ">
@@ -65,11 +57,14 @@ export const RichSeriesCard = ({
         isOpen={rankModalOpen}
         setOpen={setRankModalOpen}
         onSubmit={onSubmit}
+        onComplete={onComplete}
+        onWatchlist={onWatchlist}
+        onDrop={onDrop}
         series={series}
         ranking={ranking}
         // onClose={() => setRankModalOpen(false)}
       />
-      <div className="absolute bottom-0 w-full bg-red-500">
+      <div className="absolute bottom-0 w-full">
         <ProgressBar progress={ranking?.progress || 0} />
       </div>
       <section className="relative">
@@ -90,7 +85,7 @@ export const RichSeriesCard = ({
         </section>
         <ThreeDots
           onMouseDown={editRanking}
-          className="absolute top-3 right-3 text-white text-5xl transition hover:text-primary-500"
+          className="absolute top-1 right-1 text-white text-5xl transition hover:text-primary-500"
         />
       </section>
       <section className="bg-gray-900 h-[4.5rem] w-full ">

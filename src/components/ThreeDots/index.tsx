@@ -5,7 +5,7 @@ export default function ThreeDots(props: React.HTMLAttributes<HTMLDivElement>) {
   );
 
   return (
-    <div {...props} className={`flex group gap-1.5 ${props.className}`}>
+    <div {...props} className={`p-3 flex group gap-1.5 ${props.className}`}>
       {dot}
       {dot}
       {dot}

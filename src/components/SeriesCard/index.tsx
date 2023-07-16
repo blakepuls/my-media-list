@@ -45,24 +45,15 @@ export function SeriesCardSkeleton() {
 
 interface SeriesCardProps {
   series: Database["public"]["Tables"]["series"]["Row"];
-  isDragging?: boolean;
+  dragging?: boolean;
   style?: React.CSSProperties;
   listType: "readlist" | "watchlist";
   rankModalOpen: boolean;
   setRankModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  overlay: React.ReactNode;
   // item: Watchlist | Readlist;
   items: ItemsState;
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
 }
-
-// interface OverlayProps {
-//   moveC
-// }
-
-// function DroppedOverlay () {
-
-// }
 
 export default function SeriesCard({
   series,
@@ -71,9 +62,8 @@ export default function SeriesCard({
   rankModalOpen,
   setRankModalOpen,
   // item,
-  overlay,
   items,
-  isDragging,
+  dragging: isDragging,
 }: SeriesCardProps) {
   function moveToContainer(id: string, newContainer: keyof ItemsState) {
     const itemLocation = findItemById(items, id);
@@ -107,8 +97,7 @@ export default function SeriesCard({
       />
       {!isDragging && (
         <div className="absolute outline-none top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
-          {overlay}
-          {/* <button
+          <button
             onMouseUp={() => setRankModalOpen(true)}
             className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
           >
@@ -154,7 +143,7 @@ export default function SeriesCard({
               <AiOutlineClose />
               Delete
             </button>
-          )} */}
+          )}
         </div>
       )}
 

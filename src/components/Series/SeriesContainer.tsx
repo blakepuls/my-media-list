@@ -54,7 +54,80 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
     })
   );
 
-  const handleDragOver = ({ over, active }: any) => {};
+  function findContainer(
+    id: string,
+    items: ItemsState
+  ): keyof ItemsState | null {
+    console.log("FIND CONTAINER", id, items);
+    for (const key in items) {
+      if (
+        items[key as keyof ItemsState].some((item) => item.series_id === id)
+      ) {
+        return key as keyof ItemsState;
+      }
+    }
+
+    return null;
+  }
+
+  const handleDragOver = ({ active, over, draggingRect }: any) => {
+    if (!over) return;
+
+    const { id: activeId } = active;
+    const { id: overId } = over;
+
+    console.log("ACTIVE ", activeId, "\n", "OVER ", overId);
+
+    // Find the containers
+    const activeContainer = findContainer(activeId, items);
+    const overContainer = over.data.current?.sortable.containerId || over.id;
+    console.log("AID ", activeContainer, "\n", "OID ", overContainer);
+
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer === overContainer
+    ) {
+      return;
+    }
+
+    setItems((prev) => {
+      const activeItems = prev[activeContainer];
+      const overItems = prev[overContainer as keyof ItemsState];
+
+      // Find the indexes for the items
+      const activeIndex = activeItems.findIndex(
+        (item) => item.series_id === activeId
+      );
+      const overIndex = overItems.findIndex(
+        (item) => item.series_id === overId
+      );
+
+      let newIndex;
+      if (overId in prev) {
+        // We're at the root droppable of a container
+        newIndex = overItems.length + 1;
+      } else {
+        const isBelowLastItem =
+          over &&
+          overIndex === overItems.length - 1 &&
+          draggingRect &&
+          draggingRect.offsetTop > over.rect.offsetTop + over.rect.height;
+        const modifier = isBelowLastItem ? 1 : 0;
+        newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+      }
+
+      return moveBetweenContainers(
+        prev,
+        activeContainer,
+        activeIndex,
+        overContainer as keyof ItemsState,
+        newIndex
+      );
+
+      return prev;
+    });
+  };
 
   const handleDragEnd = ({ active, over }: any) => {
     if (!over) {
@@ -92,8 +165,7 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
             activeContainer,
             activeIndex,
             overContainer,
-            overIndex,
-            active.id
+            overIndex
           );
         }
 
@@ -110,14 +182,13 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
     >
-      <div className="flex flex-col gap-5  p-3">
+      <div className="flex flex-col gap-5 w-full  p-3">
         {items.watching.length > 0 && (
           <>
             <h2 className="text-3xl font-bold text-gray-100">
               Currently {listType == "watchlist" ? "Watching" : "Reading"}
             </h2>
             <Droppable
-              status="watching"
               listType={listType}
               items={items}
               setItems={setItems}
@@ -134,7 +205,6 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
               {listType == "watchlist" ? "Watchlist" : "Readlist"}
             </h2>
             <Droppable
-              status="idle"
               listType={listType}
               items={items}
               setItems={setItems}
@@ -149,7 +219,6 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
           <>
             <h2 className="text-3xl font-bold text-gray-100">Dropped</h2>
             <Droppable
-              status="dropped"
               listType={listType}
               items={items}
               setItems={setItems}
@@ -164,13 +233,27 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
   );
 };
 
+export function findItemById(
+  items: ItemsState,
+  id: string
+): { container: keyof ItemsState; index: number } | null {
+  for (const container in items) {
+    const index = items[container as keyof ItemsState].findIndex(
+      (item: Watchlist | Readlist) => item.series.id === id
+    );
+    if (index !== -1) {
+      return { container: container as keyof ItemsState, index };
+    }
+  }
+  return null;
+}
+
 export const moveBetweenContainers = (
   items: ItemsState,
   activeContainer: keyof ItemsState,
   activeIndex: number,
   overContainer: keyof ItemsState,
-  overIndex: number,
-  itemId: string
+  overIndex: number
 ) => {
   const itemToMove = items[activeContainer][activeIndex];
 

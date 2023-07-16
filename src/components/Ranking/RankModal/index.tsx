@@ -21,7 +21,8 @@ export interface RankingResult {
 interface RankModalProps {
   fromList?: boolean;
   onComplete?: (result: RankingResult) => void;
-
+  onWatchlist?: (result: RankingResult) => void;
+  onDrop?: (result: RankingResult) => void;
   ranking?: Ranking;
   series: Series;
   isOpen: boolean;
@@ -33,6 +34,9 @@ export function RankModal({
   ranking,
   series,
   isOpen,
+  onWatchlist,
+  onDrop,
+  onComplete,
   setOpen,
   onSubmit,
 }: RankModalProps) {
@@ -110,21 +114,51 @@ export function RankModal({
             <Counter onChange={setWatchCount} value={watch_count} />
           </section>
           <section className="mt-auto flex justify-between ">
-            <button
-              // onMouseUp={() => moveToContainer(series.id, "dropped")}
-              className="flex items-center gap-1 rounded-md hover:text-red-400 transition-colors p-1"
-            >
-              <AiOutlineStop />
-              Drop
-            </button>
-            <button className=" flex items-center gap-1 rounded-md hover:text-yellow-500 transition-colors p-1">
-              <BsFillBookmarkPlusFill />
-              Watchlist
-            </button>
-            <button className="flex items-center gap-1 rounded-md hover:text-primary-400 transition-colors p-1">
-              <AiOutlineCheck />
-              Complete
-            </button>
+            {onDrop && (
+              <button
+                onMouseUp={() =>
+                  onDrop({ tier, tier_rank: 0, rating, watch_count, progress })
+                }
+                className="flex items-center gap-1 rounded-md hover:text-red-400 transition-colors p-1"
+              >
+                <AiOutlineStop />
+                Drop
+              </button>
+            )}
+            {onWatchlist && (
+              <button
+                onMouseUp={() =>
+                  onWatchlist({
+                    tier,
+                    tier_rank: 0,
+                    rating,
+                    watch_count,
+                    progress,
+                  })
+                }
+                className=" flex items-center gap-1 rounded-md hover:text-yellow-500 transition-colors p-1"
+              >
+                <BsFillBookmarkPlusFill />
+                Watchlist
+              </button>
+            )}
+            {onComplete && (
+              <button
+                onMouseUp={() =>
+                  onComplete({
+                    tier,
+                    tier_rank: 0,
+                    rating,
+                    watch_count,
+                    progress,
+                  })
+                }
+                className="flex items-center gap-1 rounded-md hover:text-primary-400 transition-colors p-1"
+              >
+                <AiOutlineCheck />
+                Complete
+              </button>
+            )}
           </section>
           <div className=" flex gap-3 w-full ml-auto">
             <button

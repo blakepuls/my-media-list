@@ -19,7 +19,7 @@ const Droppable = ({ id, rankings, setItems, items }: DroppableProps) => {
     <SortableContext id={id} items={rankings} strategy={rectSortingStrategy}>
       <div
         ref={setNodeRef}
-        className="rounded-md flex gap-3 w-full min-h-[20rem] flex-wrap  "
+        className="rounded-md flex gap-3 w-full min-h-[11.5rem] flex-wrap  "
       >
         {rankings.map((item) => (
           <SortableItem

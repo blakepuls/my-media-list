@@ -22,7 +22,7 @@ export const SortableItem = ({
   const [rankModalOpen, setRankModalOpen] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: id, disabled: true });
+    useSortable({ id: id, disabled: rankModalOpen });
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -58,7 +58,7 @@ export const SortableItem = ({
     <div
       style={itemStyle as any}
       ref={setNodeRef}
-      className="h-52"
+      className=""
       {...attributes}
       {...listeners}
     >
@@ -69,6 +69,7 @@ export const SortableItem = ({
         rank={rank}
       /> */}
       <RichSeriesCard
+        setModalOpen={setRankModalOpen}
         ranking={rank}
         series={rank.series}
         onSubmit={onSubmit}

@@ -29,6 +29,7 @@ interface RankModalProps {
   fromList?: boolean;
   onComplete?: (result: RankingResult) => void;
   onWatchlist?: (result: RankingResult) => void;
+  onWatching?: (result: RankingResult) => void;
   onDrop?: (result: RankingResult) => void;
   onDelete?: () => void;
   ranking?: Ranking;
@@ -42,6 +43,7 @@ export function RankModal({
   ranking,
   series,
   isOpen,
+  onWatching,
   onWatchlist,
   onDelete,
   onDrop,
@@ -154,6 +156,23 @@ export function RankModal({
               >
                 <GoTrash className="text-xl" />
                 Delete
+              </button>
+            )}
+            {onWatching && (
+              <button
+                onMouseUp={() =>
+                  onWatching({
+                    tier,
+                    tier_rank: 0,
+                    rating,
+                    watch_count,
+                    progress,
+                  })
+                }
+                className=" flex items-center gap-1 rounded-md hover:text-primary-500 transition-colors p-1"
+              >
+                <AiOutlineEye />
+                Watching
               </button>
             )}
             {onDrop && (

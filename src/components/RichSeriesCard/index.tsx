@@ -26,6 +26,7 @@ interface RichSeriesCardProps {
   editable?: boolean;
   onSubmit: (updatedRanking: Ranking) => void;
   onComplete?: (result: RankingResult) => void;
+  onWatching?: (result: RankingResult) => void;
   onWatchlist?: (result: RankingResult) => void;
   onDelete?: () => void;
   onDrop?: (result: RankingResult) => void;
@@ -40,6 +41,7 @@ export const RichSeriesCard = ({
   onComplete,
   editable,
   onWatchlist,
+  onWatching,
   setModalOpen,
   onDelete,
   onDrop,
@@ -60,6 +62,11 @@ export const RichSeriesCard = ({
     setRankModalOpen(false);
   }
 
+  async function onRankingWatching(result: RankingResult) {
+    if (onWatching) await onWatching(result);
+    setRankModalOpen(false);
+  }
+
   return (
     <div className="w-full sm:w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900 ">
       <RankModal
@@ -68,6 +75,7 @@ export const RichSeriesCard = ({
         onSubmit={onSubmit}
         onComplete={onComplete}
         onWatchlist={onWatchlist}
+        onWatching={onWatching && onRankingWatching}
         onDelete={onDelete && onRankingDelete}
         onDrop={onDrop}
         series={series}

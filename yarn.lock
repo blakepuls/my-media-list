@@ -2252,10 +2252,10 @@ sucrase@^3.32.0:
     pirates "^4.0.1"
     ts-interface-checker "^0.1.9"
 
-supabase@^1.77.5:
-  version "1.77.5"
-  resolved "https://registry.yarnpkg.com/supabase/-/supabase-1.77.5.tgz#fcfb6ff87a41714a1f49e7fb807a00222e3a9dc1"
-  integrity sha512-dqafC/LzrdGBsW1Rl6228C+rk6ZJJVI06G0U+og6hI8kgwwPBCExQ5YHUmMbrrsqayIyNQgBRukREchDSC10BA==
+supabase@^1.77.9:
+  version "1.77.9"
+  resolved "https://registry.yarnpkg.com/supabase/-/supabase-1.77.9.tgz#d946ffdf32889b276488cf42017bd267b024667a"
+  integrity sha512-AyMaMsb+QpUMTE1XfV8Vhl/9G+Hkzk61RXf/JP5uyxc256hcb3N3FQoW2bi+A/BodJ/rfZOPE7vv+xtfVf6vyQ==
   dependencies:
     bin-links "^4.0.1"
     node-fetch "^3.2.10"

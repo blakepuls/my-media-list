@@ -8,6 +8,8 @@ import RichSeriesCard from "../RichSeriesCard";
 import supabase from "@/utils/supabase-browser";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/auth";
+import { addSeriesList } from "@/utils";
+import { toast } from "react-toastify";
 
 interface SortableItemProps {
   id: string;
@@ -72,6 +74,29 @@ export const SortableItem = ({
     });
   }
 
+  async function onWatching() {
+    if (!profile) return;
+
+    const listType = rank.series.type === "manga" ? "readlist" : "watchlist";
+
+    const promise = async () =>
+      supabase.from(`profile_${listType}s`).insert([
+        {
+          priority: 0,
+          profile_id: profile.id,
+          series_id: rank.series.id,
+          ranking_id: rank.id,
+          status: "watching",
+        },
+      ]);
+
+    await toast.promise(promise, {
+      pending: "Adding to watchlist...",
+      success: "Added to watchlist!",
+      error: "Error adding to watchlist",
+    });
+  }
+
   return (
     <div
       style={itemStyle as any}
@@ -90,6 +115,7 @@ export const SortableItem = ({
         setModalOpen={setRankModalOpen}
         onDelete={onDelete}
         editable={editable}
+        onWatching={onWatching}
         ranking={rank}
         series={rank.series}
         onSubmit={onSubmit}

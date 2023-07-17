@@ -52,6 +52,9 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+    --text-color: 255, 255, 255;
+    --text-hover-color: 220, 220, 220;
+    --text-active-color: 200, 200, 200;
   }
 }
 

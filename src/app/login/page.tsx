@@ -9,22 +9,6 @@ import { useAuth } from "@/hooks/auth";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { toast } from "react-toastify";
 
-export async function getServerSideProps() {
-  const { data } = await supabase.auth.getSession();
-
-  if (!data) {
-    return {
-      redirect: {
-        destination: "/dashboard", // Redirect to the dashboard if the user is signed in
-        permanent: false,
-      },
-    };
-  }
-
-  // Pass data to the page via props
-  return {};
-}
-
 interface AuthProviderProps {
   provider: "Facebook" | "Google" | "Microsoft" | "Twitter";
   providerName: "facebook" | "google" | "azure" | "twitter";

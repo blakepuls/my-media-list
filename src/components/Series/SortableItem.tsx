@@ -201,7 +201,7 @@ export const SortableItem = ({
   return (
     <div
       style={itemStyle as any}
-      className={`${container == "watching" && "w-full sm:w-auto"}`}
+      className={`touch-none ${container == "watching" && "w-full sm:w-auto"}`}
       ref={setNodeRef}
       {...attributes}
       {...listeners}

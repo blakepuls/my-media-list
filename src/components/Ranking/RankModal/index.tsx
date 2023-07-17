@@ -107,14 +107,22 @@ export function RankModal({
       onAfterClose={() => {}}
       onRequestClose={() => setOpen(false)}
     >
-      <section className="flex h-auto outline-none ">
-        <img
-          className="w-80 rounded-l-md"
+      <section className="flex flex-col h-auto outline-none ">
+        <section className="">
+          <img
+            className="w-80 h-20 opacity-40 object-cover"
+            src={series.banner || ""}
+          />
+          <h1 className="absolute top-12 p-1.5 font-bold text-xl">
+            {series.title}
+          </h1>
+        </section>
+        {/* <img
+          className="w-40 sm:w-80 rounded-l-md"
           src={series.image}
           alt={series.title}
-        />
+        /> */}
         <div className="flex flex-col gap-3 flex-grow p-3 w-80">
-          <h1 className="font-bold text-xl">{series.title}</h1>
           <Slider
             label="Progress"
             min={0}

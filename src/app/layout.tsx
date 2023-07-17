@@ -6,6 +6,13 @@ import Providers from "./providers";
 import Link from "next/link";
 import Header from "@/components/Header";
 
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "MyMediaList",
+  description: "Track, rate, and share your favorite shows, books, and movies.",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -13,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={` bg-gray-800`}>
+      <body className={`${inter.className} bg-gray-800`}>
         <Providers>
           <Header />
           <div className="flex flex-col items-center gap-3 ">{children}</div>

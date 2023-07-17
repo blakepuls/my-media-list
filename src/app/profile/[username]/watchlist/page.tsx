@@ -32,7 +32,7 @@ export default async function Watchlist({
     .single();
 
   // Select every watchlist row that belongs to the user
-  const { data: watchlistData } = await supabase
+  const { data: watchlistData, status } = await supabase
     .from("profile_watchlists")
     .select("*, series:series_id(*), ranking:ranking_id(*)")
     .eq("profile_id", profile?.id);

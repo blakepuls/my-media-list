@@ -14,3 +14,5 @@ export type RankingInsert = Tables["profile_rankings"]["Insert"];
 export type RankingTiers = Database["public"]["Enums"]["ranking_tiers"];
 export type SeriesListStatus =
   Database["public"]["Enums"]["series_list_status_enum"];
+
+export type Profile = Tables["profiles"]["Row"];

@@ -23,9 +23,11 @@ interface RichSeriesCardProps {
   id: string;
   ranking?: Ranking;
   series: Series;
+  editable?: boolean;
   onSubmit: (updatedRanking: Ranking) => void;
   onComplete?: (result: RankingResult) => void;
   onWatchlist?: (result: RankingResult) => void;
+  onDelete?: () => void;
   onDrop?: (result: RankingResult) => void;
   setModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -36,8 +38,10 @@ export const RichSeriesCard = ({
   ranking,
   onSubmit,
   onComplete,
+  editable,
   onWatchlist,
   setModalOpen,
+  onDelete,
   onDrop,
 }: RichSeriesCardProps) => {
   const [rankModalOpen, setRankModalOpen] = useState(false);
@@ -51,6 +55,11 @@ export const RichSeriesCard = ({
     setRankModalOpen(true);
   }
 
+  function onRankingDelete() {
+    if (onDelete) onDelete();
+    setRankModalOpen(false);
+  }
+
   return (
     <div className="w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900 ">
       <RankModal
@@ -59,6 +68,7 @@ export const RichSeriesCard = ({
         onSubmit={onSubmit}
         onComplete={onComplete}
         onWatchlist={onWatchlist}
+        onDelete={onDelete && onRankingDelete}
         onDrop={onDrop}
         series={series}
         ranking={ranking}
@@ -83,10 +93,12 @@ export const RichSeriesCard = ({
         <section className="absolute bottom-0 left-0 ml-[8.1rem] w-auto flex ">
           <h1 className=" text-2xl font-bold text-white">{series.title}</h1>
         </section>
-        <ThreeDots
-          onMouseDown={editRanking}
-          className="absolute top-1 right-1 text-white text-5xl transition hover:text-primary-500"
-        />
+        {editable && (
+          <ThreeDots
+            onMouseDown={editRanking}
+            className="absolute top-1 right-1 text-white text-5xl transition hover:text-primary-500"
+          />
+        )}
       </section>
       <section className="bg-gray-900 h-[4.5rem] w-full ">
         <div className="absolute top-5 left-5 flex"></div>

@@ -23,7 +23,7 @@ export function TierSelect({ tier, setTier }: TierSelectProps) {
     >
       <h1 className="text-xl ml-3">Tier</h1>
       <div
-        className={`rounded-r-md ${Tiers[tier].color} font-semibold text-gray-800 text-xl flex items-center justify-center p-1.5`}
+        className={`rounded-r-md ${Tiers[tier].color} w-6 font-semibold text-gray-800 text-xl flex items-center justify-center p-1.5`}
       >
         {Tiers[tier].letter}
       </div>

@@ -48,6 +48,7 @@ interface SeriesCardProps {
   isDragging?: boolean;
   style?: React.CSSProperties;
   listType: "readlist" | "watchlist";
+  editable?: boolean;
   rankModalOpen: boolean;
   setRankModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   overlay: React.ReactNode;
@@ -69,6 +70,7 @@ export default function SeriesCard({
   style,
   setItems,
   rankModalOpen,
+  editable,
   setRankModalOpen,
   // item,
   overlay,
@@ -105,56 +107,9 @@ export default function SeriesCard({
         alt={series.title.toString()}
         className="w-full h-72 rounded-sm shadow-md object-cover"
       />
-      {!isDragging && (
+      {!isDragging && editable && (
         <div className="absolute outline-none top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
           {overlay}
-          {/* <button
-            onMouseUp={() => setRankModalOpen(true)}
-            className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-          >
-            <AiOutlineCheck />
-            Complete
-          </button>
-
-          {item?.status != "watching" && item?.status != "dropped" && (
-            <button
-              onMouseUp={() => moveToContainer(series.id, "watching")}
-              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-            >
-              <AiFillEye />
-              Watching
-            </button>
-          )}
-
-          {item?.status != "idle" && (
-            <button
-              onMouseUp={() => moveToContainer(series.id, "idle")}
-              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-            >
-              <BsFillBookmarkPlusFill />
-              Watchlist
-            </button>
-          )}
-
-          {item?.status != "dropped" && (
-            <button
-              onMouseUp={() => moveToContainer(series.id, "dropped")}
-              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-            >
-              <AiOutlineStop />
-              Dropped
-            </button>
-          )}
-
-          {item?.status == "dropped" && (
-            <button
-              onMouseUp={() => {}}
-              className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
-            >
-              <AiOutlineClose />
-              Delete
-            </button>
-          )} */}
         </div>
       )}
 

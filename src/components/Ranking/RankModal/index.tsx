@@ -7,8 +7,15 @@ import supabase from "@/utils/supabase-browser";
 import { toast } from "react-toastify";
 import Counter from "@/components/Counter";
 import { updateRanking } from "@/utils/rankings";
-import { AiFillEye, AiOutlineCheck, AiOutlineStop } from "react-icons/ai";
-import { BsFillBookmarkPlusFill } from "react-icons/bs";
+import {
+  AiFillEye,
+  AiOutlineCheck,
+  AiOutlineClose,
+  AiOutlineEye,
+  AiOutlineStop,
+} from "react-icons/ai";
+import { BsFillBookmarkPlusFill, BsFillTrashFill } from "react-icons/bs";
+import { GoTrash } from "react-icons/go";
 
 export interface RankingResult {
   tier: Ranking["tier"];
@@ -23,6 +30,7 @@ interface RankModalProps {
   onComplete?: (result: RankingResult) => void;
   onWatchlist?: (result: RankingResult) => void;
   onDrop?: (result: RankingResult) => void;
+  onDelete?: () => void;
   ranking?: Ranking;
   series: Series;
   isOpen: boolean;
@@ -35,6 +43,7 @@ export function RankModal({
   series,
   isOpen,
   onWatchlist,
+  onDelete,
   onDrop,
   onComplete,
   setOpen,
@@ -71,6 +80,19 @@ export function RankModal({
           setOpen(false);
         })
         .catch(() => {});
+    }
+  }
+
+  async function complete() {
+    await submit();
+    if (onComplete) {
+      onComplete({
+        tier,
+        rating,
+        tier_rank: 0,
+        watch_count,
+        progress,
+      });
     }
   }
 
@@ -111,9 +133,21 @@ export function RankModal({
           />
           <section className="flex justify-between">
             <TierSelect setTier={setTier} tier={tier} />
-            <Counter onChange={setWatchCount} value={watch_count} />
+            <div className="flex gap-2 items-center">
+              <AiOutlineEye className="text-3xl" />
+              <Counter onChange={setWatchCount} value={watch_count} />
+            </div>
           </section>
           <section className="mt-auto flex justify-between ">
+            {onDelete && (
+              <button
+                onMouseUp={() => onDelete()}
+                className="flex items-center gap-1 rounded-md hover:text-red-400 transition-colors p-1"
+              >
+                <GoTrash className="text-xl" />
+                Delete
+              </button>
+            )}
             {onDrop && (
               <button
                 onMouseUp={() =>
@@ -144,15 +178,7 @@ export function RankModal({
             )}
             {onComplete && (
               <button
-                onMouseUp={() =>
-                  onComplete({
-                    tier,
-                    tier_rank: 0,
-                    rating,
-                    watch_count,
-                    progress,
-                  })
-                }
+                onMouseUp={complete}
                 className="flex items-center gap-1 rounded-md hover:text-primary-400 transition-colors p-1"
               >
                 <AiOutlineCheck />

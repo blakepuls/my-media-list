@@ -16,6 +16,9 @@ import {
 } from "react-icons/ai";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import supabase from "@/utils/supabase-browser";
+import { RankingResult } from "../Ranking/RankModal";
+import { useAuth } from "@/hooks/auth";
+import { usePathname } from "next/navigation";
 
 interface SortableItemProps {
   id: string;
@@ -97,7 +100,9 @@ export const SortableItem = ({
   listType,
 }: SortableItemProps) => {
   const [rankModalOpen, setRankModalOpen] = useState(false);
-
+  const usernameSlug = usePathname().split("/")[2];
+  const { profile } = useAuth();
+  const editable = usernameSlug == profile?.username;
   const item = items["watching"].find((item) => item.series.id === series.id);
 
   const {
@@ -107,7 +112,10 @@ export const SortableItem = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: id, disabled: rankModalOpen });
+  } = useSortable({
+    id: id,
+    disabled: rankModalOpen || !editable,
+  });
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -153,7 +161,19 @@ export const SortableItem = ({
     });
   }
 
-  function onComplete() {}
+  async function onComplete(ranking: RankingResult) {
+    // Remove the item from the watchlist
+    await supabase.from(`profile_${listType}s`).delete().eq("series_id", id);
+    setItems((prevItems) => {
+      let newState = JSON.parse(JSON.stringify(prevItems));
+      for (let key in newState) {
+        newState[key] = newState[key].filter(
+          (item: any) => item.series.id !== series.id
+        );
+      }
+      return newState;
+    });
+  }
 
   function onSubmit(updatedRanking: Ranking) {
     setItems((prevItems) => {
@@ -188,6 +208,7 @@ export const SortableItem = ({
       {item ? (
         <RichSeriesCard
           id={id}
+          editable={editable}
           setModalOpen={setRankModalOpen}
           onComplete={onComplete}
           onDrop={onDrop}
@@ -198,6 +219,7 @@ export const SortableItem = ({
         />
       ) : (
         <SeriesCard
+          editable={editable}
           setRankModalOpen={setRankModalOpen}
           rankModalOpen={rankModalOpen}
           isDragging={isDragging}

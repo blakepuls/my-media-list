@@ -78,10 +78,20 @@ const useSupabaseAuth = () => {
   };
 
   useEffect(() => {
-    const subscription = supabase.auth.onAuthStateChange(authStateChanged);
-    return () => {
-      subscription.data?.subscription.unsubscribe();
-    };
+    (async () => {
+      const session = await supabase.auth.getSession();
+
+      if (session && session.data.session?.user) {
+        // User is already logged in, handle this state
+        authStateChanged("SIGNED_IN", session.data.session);
+      }
+
+      const subscription = supabase.auth.onAuthStateChange(authStateChanged);
+
+      return () => {
+        subscription.data?.subscription.unsubscribe();
+      };
+    })();
   }, []);
 
   return {

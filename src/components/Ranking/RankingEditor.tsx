@@ -66,13 +66,7 @@ export default function RankingEditor({ list }: SeriesEditorProps) {
 
       // Merge arrays into a single one
       const flattenedItemsData = itemsData.flat();
-      console.log("itemsData", flattenedItemsData);
-
-      console.log("flat", flattenedItemsData);
-
-      const test = await supabase
-        .from(`profile_rankings`)
-        .upsert(flattenedItemsData);
+      await supabase.from(`profile_rankings`).upsert(flattenedItemsData);
     }, 3000);
 
     // Clear the timeout when the component unmounts
@@ -81,10 +75,5 @@ export default function RankingEditor({ list }: SeriesEditorProps) {
     };
   }, [items]);
 
-  return (
-    <>
-      <Test data={items} />
-      <SeriesContainer items={items} setItems={setItems} list={list} />;
-    </>
-  );
+  return <SeriesContainer items={items} setItems={setItems} list={list} />;
 }

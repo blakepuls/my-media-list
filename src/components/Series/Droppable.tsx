@@ -8,6 +8,7 @@ import { ItemsState } from "./SeriesEditor";
 interface DroppableProps {
   id: string;
   series: Series[];
+  editable?: boolean;
   items: ItemsState;
   setItems: React.Dispatch<React.SetStateAction<ItemsState>>;
   listType: "readlist" | "watchlist";
@@ -17,6 +18,7 @@ const Droppable = ({
   listType,
   id,
   series,
+  editable,
   setItems,
   items,
 }: DroppableProps) => {

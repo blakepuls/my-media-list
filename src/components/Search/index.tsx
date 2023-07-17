@@ -155,7 +155,7 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
 }
 
 interface SearchProps {
-  onChange: (results: ISearchState) => void;
+  onChange?: (results: ISearchState) => void;
 }
 
 export default function Search(props: SearchProps) {
@@ -211,17 +211,18 @@ export default function Search(props: SearchProps) {
 
     debounceTimeoutRef.current = setTimeout(async () => {
       const search = e.target.value;
-      // const results = await universalSearch(search);
-
-      // if (!results) {
-      //   return;
-      // }
-
-      // setSearchResults(results);
-
-      // Add the search query to the URL (without adding a new entry into the browser’s history stack)
       router.replace(`/browse?search=${search}`);
     }, 500);
+  };
+
+  const handleEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      const search = e.currentTarget.value;
+      router.replace(`/browse?search=${search}`);
+    }
   };
 
   return (
@@ -235,6 +236,7 @@ export default function Search(props: SearchProps) {
         placeholder="Search..."
         {...props}
         className="bg-transparent h-full w-full rounded-lg text-sm outline-none"
+        onKeyDown={handleEnterPress}
         onChange={handleSearch}
       />
 

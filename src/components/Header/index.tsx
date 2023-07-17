@@ -26,7 +26,7 @@ export default function Header() {
         </Link>
         <Link
           className="transition-colors hover:text-primary-500"
-          href={`/profile/${profile?.username}`}
+          href={`/profile/${profile?.username}/watchlist`}
         >
           Profile
         </Link>

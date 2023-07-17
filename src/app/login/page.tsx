@@ -27,15 +27,16 @@ export async function getServerSideProps() {
 
 interface AuthProviderProps {
   provider: "Facebook" | "Google" | "Microsoft" | "Twitter";
+  providerName: "facebook" | "google" | "azure" | "twitter";
   onClick: () => void;
 }
 
-function AuthProvider({ provider, onClick }: AuthProviderProps) {
+function AuthProvider({ provider, onClick, providerName }: AuthProviderProps) {
   async function signInWithProvider() {
     //Sign in with provider using supabase
     const { data, error } = await supabase.auth.signInWithOAuth({
       // @ts-ignore - provider options include a capital letter, but the type only allows lowercase
-      provider: provider.toLowerCase(),
+      provider: providerName,
       options: {},
     });
 
@@ -52,7 +53,7 @@ function AuthProvider({ provider, onClick }: AuthProviderProps) {
 
   return (
     <button
-      className={`rounded-full shadow-md w-full flex gap-3`}
+      className={`rounded-md shadow-md w-full flex items-center gap-3 p-3 bg-gray-900 transition-transform hover:-translate-y-1`}
       onClick={signInWithProvider}
     >
       <Image
@@ -63,7 +64,7 @@ function AuthProvider({ provider, onClick }: AuthProviderProps) {
         width={40}
         height={40}
       />
-      {/* Login with {provider} */}
+      <span className="ml-3 text-xl">Login with {provider}</span>
     </button>
   );
 }
@@ -125,6 +126,7 @@ function SignUpWithEmailPrompt() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [confirm, setConfirm] = useState(false);
 
   async function signUp() {
     // Check if the username is taken, regardless of case
@@ -148,14 +150,17 @@ function SignUpWithEmailPrompt() {
     }
 
     if (data) {
-      // Navigate to the dashboard
-      console.log(data);
-      window.location.href = "/";
+      setConfirm(true);
     }
   }
 
   return (
     <div className="flex flex-col gap-3 w-80">
+      {confirm && (
+        <section className="bg-opacity-25 bg-red-500 w-full p-3 rounded-sm">
+          Please confirm your email address to continue
+        </section>
+      )}
       {/* <h2 className="text-2xl">Sign up with Email</h2> */}
       <section className="flex flex-col gap-1 ">
         <Input
@@ -209,17 +214,6 @@ function LoginPrompt() {
   // Using supabase to login with facebook, google, microsoft, twitter, and email
   return (
     <div className="flex flex-col gap-3 items-center w-80">
-      <section className="flex gap-3">
-        <AuthProvider provider="Google" onClick={() => {}} />
-        <AuthProvider provider="Facebook" onClick={() => {}} />
-        <AuthProvider provider="Microsoft" onClick={() => {}} />
-        <AuthProvider provider="Twitter" onClick={() => {}} />
-      </section>
-      <div className="flex items-center w-full">
-        <hr className="flex-grow border-gray-300" />
-        <h2 className="mx-2">OR</h2>
-        <hr className="flex-grow border-gray-300" />
-      </div>
       <LoginWithEmail />
       <p>
         Don't have an account?{" "}
@@ -227,6 +221,33 @@ function LoginPrompt() {
           Sign up
         </a>
       </p>
+      <div className="flex items-center w-full">
+        <hr className="flex-grow border-gray-300" />
+        <h2 className="mx-2">OR</h2>
+        <hr className="flex-grow border-gray-300" />
+      </div>
+      <section className="flex gap-3 w-full">
+        <AuthProvider
+          providerName="google"
+          provider="Google"
+          onClick={() => {}}
+        />
+        {/* <AuthProvider
+          providerName="facebook"
+          provider="Facebook"
+          onClick={() => {}}
+        />
+        <AuthProvider
+          providerName="azure"
+          provider="Microsoft"
+          onClick={() => {}}
+        />
+        <AuthProvider
+          providerName="twitter"
+          provider="Twitter"
+          onClick={() => {}}
+        /> */}
+      </section>
     </div>
   );
 }

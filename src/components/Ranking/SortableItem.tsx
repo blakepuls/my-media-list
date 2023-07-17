@@ -5,6 +5,9 @@ import { Ranking, Series } from "@/types/database";
 import { ItemsState, RankingData } from "./RankingEditor";
 import RankingItem from "./Ranking";
 import RichSeriesCard from "../RichSeriesCard";
+import supabase from "@/utils/supabase-browser";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/auth";
 
 interface SortableItemProps {
   id: string;
@@ -20,9 +23,12 @@ export const SortableItem = ({
   setItems,
 }: SortableItemProps) => {
   const [rankModalOpen, setRankModalOpen] = useState(false);
+  const usernameSlug = usePathname().split("/")[2];
+  const { profile } = useAuth();
+  const editable = usernameSlug == profile?.username;
 
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: id, disabled: rankModalOpen });
+    useSortable({ id: id, disabled: rankModalOpen || !editable });
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -30,18 +36,14 @@ export const SortableItem = ({
   };
 
   function onSubmit(updatedRanking: Ranking) {
+    console.log("UPDATED RANKING", updatedRanking);
     setItems((prevItems) => {
       // Create a deep copy of the previous state
       let newState = JSON.parse(JSON.stringify(prevItems));
 
-      // Find the ranking that was updated
-      const ranking = newState[updatedRanking.tier].find(
-        (item: any) => item.id === updatedRanking.id
-      );
-
       // Remove old ranking from its tier
-      newState[ranking.tier] = newState[ranking.tier].filter(
-        (item: any) => item.id !== ranking.id
+      newState[rank.tier] = newState[rank.tier].filter(
+        (item: any) => item.id !== rank.id
       );
 
       // Add the updated ranking to its new tier
@@ -49,6 +51,22 @@ export const SortableItem = ({
         ...newState[updatedRanking.tier],
         updatedRanking,
       ];
+
+      return newState;
+    });
+  }
+
+  async function onDelete() {
+    await supabase.from("profile_rankings").delete().eq("id", rank.id);
+
+    setItems((prevItems) => {
+      // Create a deep copy of the previous state
+      let newState = JSON.parse(JSON.stringify(prevItems));
+
+      // Remove old ranking from its tier
+      newState[rank.tier] = newState[rank.tier].filter(
+        (item: any) => item.id !== rank.id
+      );
 
       return newState;
     });
@@ -70,6 +88,8 @@ export const SortableItem = ({
       /> */}
       <RichSeriesCard
         setModalOpen={setRankModalOpen}
+        onDelete={onDelete}
+        editable={editable}
         ranking={rank}
         series={rank.series}
         onSubmit={onSubmit}

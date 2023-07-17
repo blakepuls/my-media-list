@@ -34,6 +34,8 @@ interface SeriesRowProps {
 }
 
 interface SeriesContainerProps {
+  editable?: boolean;
+
   list: Watchlist[] | Readlist[];
   listType: "watchlist" | "readlist";
   items: ItemsState;
@@ -48,7 +50,11 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
   setItems,
 }) => {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })

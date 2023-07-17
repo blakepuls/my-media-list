@@ -15,12 +15,12 @@ export default function Header() {
         pathname.includes("profile") && "bg-gray-900"
       }`}
     >
-      <div className="w-1/3 text-left">
+      <div className="hidden sm:flex w-1/3 text-left">
         <Link className="text-xl font-bold" href="/">
           MyMediaList
         </Link>
       </div>
-      <nav className="w-1/3 flex gap-5 font-medium items-center justify-center text-center">
+      <nav className="w-full lg:w-1/3 flex gap-1.5 sm:gap-5 sm:justify-center font-medium items-center lg:justify-center text-center">
         <Link className="transition-colors hover:text-primary-500" href="/">
           Home
         </Link>

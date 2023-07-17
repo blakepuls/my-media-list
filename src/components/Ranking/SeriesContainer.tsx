@@ -10,6 +10,8 @@ import {
   useSensors,
   rectIntersection,
   closestCorners,
+  TouchSensor,
+  MouseSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -48,7 +50,11 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
   setItems,
 }) => {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+
+    // useSensor(PointerSensor),
+    // useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })

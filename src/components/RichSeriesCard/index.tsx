@@ -61,7 +61,7 @@ export const RichSeriesCard = ({
   }
 
   return (
-    <div className="w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900 ">
+    <div className="w-full sm:w-96 flex flex-col relative overflow-hidden rounded-t-sm bg-gray-900 ">
       <RankModal
         isOpen={rankModalOpen}
         setOpen={setRankModalOpen}

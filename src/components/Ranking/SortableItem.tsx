@@ -76,7 +76,7 @@ export const SortableItem = ({
     <div
       style={itemStyle as any}
       ref={setNodeRef}
-      className=""
+      className="w-full sm:w-auto "
       {...attributes}
       {...listeners}
     >

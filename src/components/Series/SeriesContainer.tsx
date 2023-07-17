@@ -9,6 +9,8 @@ import {
   useSensor,
   useSensors,
   rectIntersection,
+  MouseSensor,
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -50,7 +52,12 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
   setItems,
 }) => {
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 5,
       },

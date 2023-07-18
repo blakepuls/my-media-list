@@ -40,7 +40,7 @@ async function queryProviderForSeries(
       provider_id,
       type: type,
       title: series?.name || series?.title,
-      release_date: series?.release_date || series?.first_air_date,
+      release_date: series?.release_date || series?.first_air_date || null,
       image:
         series.poster_path &&
         `https://image.tmdb.org/t/p/original/${series.poster_path}`,

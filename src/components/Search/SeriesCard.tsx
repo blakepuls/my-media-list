@@ -94,8 +94,15 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
 
     if (!user.user) return;
 
+    let seriesType = type.toLowerCase();
+    if (seriesType === "movie") {
+      seriesType = result.type === "Movie" ? "movie" : "tv";
+    }
+
+    console.log("series type is", seriesType);
+
     // Get series from series list
-    const res = await fetch(`/api/series/${type.toLowerCase()}/${result.id}`);
+    const res = await fetch(`/api/series/${seriesType}/${result.id}`);
     const data = await res.json();
 
     console.log(res, data);
@@ -128,17 +135,19 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
       className="relative flex flex-col  rounded-md w-52 group"
       onClick={() => console.log(result)}
     >
-      <RankModal
-        isOpen={rankModalOpen}
-        series={{
-          banner: dbSeries?.banner || "",
-          id: result.id,
-          title: result.title.toString(),
-        }}
-        setOpen={setRankModalOpen}
-        onSubmit={() => {}}
-        ranking={ranking}
-      />
+      {dbSeries && (
+        <RankModal
+          isOpen={rankModalOpen}
+          series={{
+            banner: dbSeries.banner || "",
+            id: dbSeries.id,
+            title: dbSeries.title,
+          }}
+          setOpen={setRankModalOpen}
+          onSubmit={() => {}}
+          ranking={ranking}
+        />
+      )}
       <img
         src={result.image}
         alt={result.title.toString()}

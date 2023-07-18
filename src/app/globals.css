@@ -24,13 +24,13 @@
     @apply active:translate-y-0 active:shadow-none;
     @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0;
     @apply flex items-center gap-1.5 outline-none justify-center;
-    @apply text-center;
+    @apply text-center select-none;
   }
   .btn-secondary {
     @apply bg-gray-700 cursor-pointer text-white shadow-md rounded-md hover:bg-gray-600 hover:shadow-lg transition duration-300 p-2.5;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
     @apply flex items-center gap-1.5 outline-none justify-center;
-    @apply flex items-center gap-1.5 outline-none;
+    @apply flex items-center select-none gap-1.5 outline-none;
   }
 
   .input {

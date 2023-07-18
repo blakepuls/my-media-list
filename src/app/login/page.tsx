@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/auth";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { toast } from "react-toastify";
+import { AiOutlineWarning } from "react-icons/ai";
 
 interface AuthProviderProps {
   provider: "Facebook" | "Google" | "Microsoft" | "Twitter";
@@ -141,7 +142,8 @@ function SignUpWithEmailPrompt() {
   return (
     <div className="flex flex-col gap-3 w-80">
       {confirm && (
-        <section className="bg-opacity-25 bg-red-500 w-full p-3 rounded-sm">
+        <section className="bg-opacity-25 bg-red-500 items-center w-full p-3 rounded-sm flex gap-3">
+          <AiOutlineWarning className="text-4xl" />
           Please confirm your email address to continue
         </section>
       )}

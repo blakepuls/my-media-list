@@ -23,9 +23,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-gray-800 h-screen`}>
         <Providers>
           <Header />
-          <div className="flex flex-col items-center gap-3 px-1">
-            {children}
-          </div>
+          <div className="flex flex-col items-center gap-3">{children}</div>
         </Providers>
       </body>
     </html>

@@ -106,7 +106,7 @@ export async function POST(
   }
 
   const seriesDetailsRes = await fetch(
-    `http://localhost:3000/api/series/${body.type}/${params.providerId}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/series/${body.type}/${params.providerId}`
   );
 
   console.log("\n\n\n\nEXECUTING\n\n\n\n");

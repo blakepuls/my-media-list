@@ -11,7 +11,7 @@ export default function Header() {
 
   return (
     <header
-      className={`relative flex w-full p-3 items-center ${
+      className={`relative flex w-full p-3 items-center h-14 ${
         pathname.includes("profile") && "bg-gray-900"
       }`}
     >

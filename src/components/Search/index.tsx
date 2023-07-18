@@ -23,6 +23,13 @@ import { addSeriesList, removeSeriesList } from "@/utils";
 import supabase from "@/utils/supabase-browser";
 import { useAuth } from "@/hooks/auth";
 
+function capitalizeWords(input: string): string {
+  return input
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 interface AnimeResult {
   onList: boolean;
 }
@@ -156,6 +163,7 @@ async function universalSearch(search: string): Promise<ISearchResult | null> {
 
 interface SearchProps {
   onChange?: (results: ISearchState) => void;
+  autoSearch?: boolean;
 }
 
 export default function Search(props: SearchProps) {
@@ -205,12 +213,18 @@ export default function Search(props: SearchProps) {
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.value = capitalizeWords(e.target.value);
+
+    if (!props.autoSearch) return;
+
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
 
     debounceTimeoutRef.current = setTimeout(async () => {
-      const search = e.target.value;
+      let search = e.target.value;
+      search = capitalizeWords(search); // Apply capitalization
+      e.target.value = search; // Set the new value
       router.replace(`/browse?search=${search}`);
     }, 500);
   };
@@ -220,7 +234,9 @@ export default function Search(props: SearchProps) {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
       }
-      const search = e.currentTarget.value;
+      let search = e.currentTarget.value;
+      search = capitalizeWords(search); // Apply capitalization
+      e.currentTarget.value = search; // Set the new value
       router.replace(`/browse?search=${search}`);
     }
   };

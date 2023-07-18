@@ -13,7 +13,7 @@ export default function Browse() {
 
   return (
     <main className="flex flex-col items-center gap-3 w-full">
-      <Search onChange={setSearch} />
+      <Search autoSearch={true} onChange={setSearch} />
       <section className="flex justify-center items-center flex-wrap gap-5 overflow-y-auto mt-2x">
         {search?.status === "loading" && (
           <>

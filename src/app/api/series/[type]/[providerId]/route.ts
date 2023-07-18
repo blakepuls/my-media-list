@@ -30,8 +30,6 @@ async function queryProviderForSeries(
       return;
     }
 
-    console.log("FROM QUERY RES", series);
-
     // Format the series details in the format (7.64 -> 7.6)
     let rating = series.vote_average.toFixed(1);
     if (rating == "0.0") {
@@ -104,13 +102,18 @@ export async function GET(
 
   const supabase = createRouteHandlerClient<Database>({ cookies });
 
-  // Check if the series exists in the series table
-  let { data: series, error } = await supabase
+  // Get the series details from the series table
+  let { data: series, error } = await supabaseAdmin
     .from("series")
     .select("*")
     .eq("provider", provider)
     .eq("provider_id", params.providerId)
     .single();
+
+  // .eq("provider", "tmdb");
+  // .eq("provider_id", "18491");
+
+  console.log("right here", provider, params.providerId, series, error);
 
   if (!series) {
     // Series does not exist in the series table, so create it
@@ -119,8 +122,6 @@ export async function GET(
       params.providerId,
       params.type as TMDBType
     );
-
-    console.log("SERIESDETAILS", seriesDetails);
 
     if (!seriesDetails) {
       return NextResponse.json({

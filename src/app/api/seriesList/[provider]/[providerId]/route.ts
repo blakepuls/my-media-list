@@ -109,7 +109,6 @@ export async function POST(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/series/${body.type}/${params.providerId}`
   );
 
-  console.log("\n\n\n\nEXECUTING\n\n\n\n");
   const series = await seriesDetailsRes.json();
 
   if (!series) {
@@ -151,6 +150,7 @@ export async function POST(
     .select("*");
 
   if (watchlistError) {
+    console.log(series);
     // Handle error
     return NextResponse.json(
       {
@@ -160,6 +160,7 @@ export async function POST(
     );
   }
 
+  console.log("\n\n\n\nEXECUTING\n\n\n\n");
   return NextResponse.json(
     {
       message: "Series added to watchlist successfully",

@@ -1,7 +1,7 @@
 import { Ranking as Ranking, Series } from "@/types/database";
 import Modal from "../../Modal";
 import Slider from "../../Slider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TierSelect, Tiers } from "../../TierSelect";
 import supabase from "@/utils/supabase-browser";
 import { toast } from "react-toastify";
@@ -33,7 +33,13 @@ interface RankModalProps {
   onDrop?: (result: RankingResult) => void;
   onDelete?: () => void;
   ranking?: Ranking;
-  series: Series;
+  series:
+    | Series
+    | {
+        id: string;
+        title: string;
+        banner: string;
+      };
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onSubmit: (SubmitResponse: Ranking) => void;
@@ -55,6 +61,13 @@ export function RankModal({
   const [rating, setRating] = useState(ranking?.rating || 5);
   const [watch_count, setWatchCount] = useState(ranking?.watch_count || 1);
   const [progress, setProgress] = useState(ranking?.progress || 1);
+
+  useEffect(() => {
+    setTier(ranking?.tier || "S");
+    setRating(ranking?.rating || 5);
+    setWatchCount(ranking?.watch_count || 1);
+    setProgress(ranking?.progress || 1);
+  }, [ranking]);
 
   async function submit() {
     if (onSubmit) {
@@ -111,11 +124,15 @@ export function RankModal({
     >
       <section className="flex flex-col h-auto outline-none ">
         <section className="">
-          <img
-            className="w-80 h-20 opacity-40 object-cover"
-            src={series.banner || ""}
-          />
-          <h1 className="absolute top-12 p-1.5 font-bold text-xl">
+          <div className="h-20">
+            {series.banner && (
+              <img
+                className="w-80 h-20 opacity-40 object-cover"
+                src={series.banner || ""}
+              />
+            )}
+          </div>
+          <h1 className="absolute top-0 align-text-bottom p-1.5 font-bold text-xl">
             {series.title}
           </h1>
         </section>

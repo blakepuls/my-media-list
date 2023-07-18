@@ -2,6 +2,7 @@
 
 import Search from "@/components/Search";
 import SeriesContainer from "@/components/Series/SeriesContainer";
+import Tooltip from "@/components/Tooltip";
 import firebase from "firebase/app";
 import { addDoc, collection } from "firebase/firestore";
 import Image from "next/image";

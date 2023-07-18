@@ -1,10 +1,15 @@
 import { addSeriesList, removeSeriesList } from "@/utils";
 import { IAnimeResult, IMovieResult, IMangaResult } from "@consumet/extensions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiFillTrophy, AiFillStar } from "react-icons/ai";
 import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 import Skeleton from "../Skeleton";
+import { RankModal } from "../Ranking/RankModal";
+import { Ranking, Series } from "@/types/database";
+import supabase from "@/utils/supabase-browser";
+import { useAuth } from "@/hooks/auth";
+import Tooltip from "../Tooltip";
 
 export function SeriesCardSkeleton() {
   return (
@@ -28,8 +33,13 @@ interface MediaResultProps {
 export default function SeriesCard({ result, type, onList }: MediaResultProps) {
   const [isOnList, setIsOnList] = useState(onList);
   const [seriesId, setSeriesId] = useState(result.seriesId);
+  const [rankModalOpen, setRankModalOpen] = useState(false);
+  const [ranking, setRanking] = useState<Ranking | undefined>(undefined);
+  // Series record in the database (Has more info than the result)
+  const [dbSeries, setDbSeries] = useState<Series | undefined>(undefined);
 
-  function listAdd() {
+  function listAdd(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.stopPropagation();
     const promise =
       type === "Manga"
         ? addSeriesList(result.id, "manga")
@@ -55,7 +65,8 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
       .catch(() => {});
   }
 
-  function listRemove() {
+  function listRemove(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.stopPropagation();
     const promise =
       type === "Manga"
         ? removeSeriesList(seriesId, "manga")
@@ -75,17 +86,65 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
       .catch(() => {});
   }
 
+  async function openRankModal(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
+    event.stopPropagation();
+    const { data: user } = await supabase.auth.getUser();
+
+    if (!user.user) return;
+
+    // Get series from series list
+    const res = await fetch(`/api/series/${type.toLowerCase()}/${result.id}`);
+    const data = await res.json();
+
+    console.log(res, data);
+
+    //If it fails to get the series, return
+    if (res.status !== 200) {
+      toast.error("Failed to get series");
+      return;
+    }
+
+    setDbSeries(data);
+
+    // Get ranking from rankings list
+    const { data: rankingData } = await supabase
+      .from("profile_rankings")
+      .select("*")
+      .eq("profile_id", user.user.id)
+      .eq("series_id", data.id)
+      .single();
+
+    console.log("the ranking data is", rankingData);
+
+    setRanking(rankingData || undefined);
+
+    setRankModalOpen(true);
+  }
+
   return (
     <div
-      className="relative flex flex-col  rounded-md w-52 "
+      className="relative flex flex-col  rounded-md w-52 group"
       onClick={() => console.log(result)}
     >
+      <RankModal
+        isOpen={rankModalOpen}
+        series={{
+          banner: dbSeries?.banner || "",
+          id: result.id,
+          title: result.title.toString(),
+        }}
+        setOpen={setRankModalOpen}
+        onSubmit={() => {}}
+        ranking={ranking}
+      />
       <img
         src={result.image}
         alt={result.title.toString()}
-        className="w-full h-72 rounded-sm shadow-md object-cover"
+        className="w-full h-72 rounded-sm shadow-md object-cover group-hover:blur-sm group-hover:opacity-40"
       />
-      <div className="absolute top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+      <div className="absolute top-0 left-0 w-full h-72 rounded-sm bg-transparent bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
         {isOnList ? (
           <button
             className="m-2 outline-none flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1"
@@ -103,16 +162,20 @@ export default function SeriesCard({ result, type, onList }: MediaResultProps) {
             {["Movie", "TV Series"].includes(type) ? "Watchlist" : "Readlist"}
           </button>
         )}
-        <button className="m-2 flex items-center gap-1 rounded-md hover:scale-125 transition-transform p-1">
-          <AiFillTrophy />
+        <button
+          className="m-2 flex items-center group gap-1 rounded-md hover:scale-125 transition-transform p-1"
+          onClick={openRankModal}
+        >
+          <AiFillTrophy className="  transition-colors" />
           Rank
         </button>
       </div>
 
-      <div className="flex flex-col gap-0.5 overflow-hidden h-14 p-1">
-        <h1 className="whitespace-nowrap text-left font-semibold overflow-hidden">
+      <div className="flex flex-col gap-0.5  h-14 p-1">
+        {/* <h1 className="whitespace-nowrap text-left font-semibold overflow-hidden">
           {result.title.toString()}
-        </h1>
+        </h1> */}
+        <Tooltip text={result.title.toString()} length={20} />
 
         <section className="flex items-center  text-gray-300">
           <span>

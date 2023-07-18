@@ -37,7 +37,7 @@ export default function Header() {
           Browse
         </Link>
       </nav>
-      <div className="w-1/3 flex justify-end mr-3 sm:mr-0">
+      <div className="w-1/3 flex justify-end mr-3 sm:mr-3">
         <UserMini />
       </div>
     </header>

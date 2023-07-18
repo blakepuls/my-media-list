@@ -99,16 +99,16 @@ export default function SeriesCard({
 
   return (
     <div
-      className={`cursor-pointer relative flex flex-col rounded-md w-52 select-none outline-none`}
+      className={`cursor-pointer relative flex flex-col rounded-md w-52 select-none outline-none group`}
       style={style}
     >
       <img
         src={series.image!}
         alt={series.title.toString()}
-        className="w-full h-72 rounded-sm shadow-md object-cover"
+        className="w-full h-72 rounded-sm shadow-md object-cover group-hover:blur-sm group-hover:opacity-40 transition-all"
       />
       {!isDragging && editable && (
-        <div className="absolute outline-none top-0 left-0 w-full h-72 rounded-sm bg-black bg-opacity-80 flex items-center flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+        <div className="absolute outline-none top-0 left-0 w-full h-72 rounded-sm bg-transparent bg-opacity-80 flex items-center flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
           {overlay}
         </div>
       )}

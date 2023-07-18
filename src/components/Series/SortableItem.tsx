@@ -48,20 +48,32 @@ function SeriesCardOverlay({
     return (
       <>
         <button
-          onMouseUp={() => moveToContainer("watching")}
+          onMouseUp={(e) => {
+            e.stopPropagation();
+            moveToContainer("watching");
+          }}
           className={className}
         >
           <AiOutlineEye />
           Watching
         </button>
         <button
-          onMouseUp={() => moveToContainer("dropped")}
+          onMouseUp={(e) => {
+            e.stopPropagation();
+            moveToContainer("dropped");
+          }}
           className={className}
         >
           <AiOutlineStop />
           Dropped
         </button>
-        <button onMouseUp={onDelete} className={className}>
+        <button
+          onMouseUp={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className={className}
+        >
           <AiOutlineClose />
           Delete
         </button>

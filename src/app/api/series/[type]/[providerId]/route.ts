@@ -30,7 +30,7 @@ async function queryProviderForSeries(
       return;
     }
 
-    console.log(series);
+    console.log("FROM QUERY RES", series);
 
     // Format the series details in the format (7.64 -> 7.6)
     let rating = series.vote_average.toFixed(1);
@@ -41,10 +41,14 @@ async function queryProviderForSeries(
       provider,
       provider_id,
       type: type,
-      title: series?.title as string,
-      release_date: series?.release_date as string,
-      image: `https://image.tmdb.org/t/p/original/${series.poster_path}`,
-      banner: `https://image.tmdb.org/t/p/original/${series.backdrop_path}`,
+      title: series?.name || series?.title,
+      release_date: series?.release_date || series?.first_air_date,
+      image:
+        series.poster_path &&
+        `https://image.tmdb.org/t/p/original/${series.poster_path}`,
+      banner:
+        series.backdrop_path &&
+        `https://image.tmdb.org/t/p/original/${series.backdrop_path}`,
       rating: rating as any,
     };
   }
@@ -83,34 +87,63 @@ async function queryProviderForSeries(
   // Return the series details in the format required for your series table
 }
 
-export async function POST(
+export async function GET(
   req: Request,
-  { params }: { params: { provider: string; providerId: string } }
+  { params }: { params: { type: string; providerId: string } }
 ) {
-  const body = (await req.json()) as SeriesPostBody;
-  // If params.provider is not a valid provider, return 404
-  if (!["tmdb", "anilist-manga"].includes(params.provider)) {
-    return NextResponse.json({ message: "Invalid provider" }, { status: 404 });
+  console.log("\n\n\nEXECUTING ON SERIES NOT LIST\n\n\n");
+
+  if (!["tv", "movie", "manga"].includes(params.type)) {
+    return NextResponse.json({ message: "Invalid type" }, { status: 400 });
   }
 
-  if (!["tv", "movie", "manga"].includes(body.type)) {
-    return NextResponse.json({ message: "Invalid type" }, { status: 400 });
+  let provider = "tmdb";
+  if (params.type === "manga") {
+    provider = "anilist-manga";
   }
 
   const supabase = createRouteHandlerClient<Database>({ cookies });
 
-  const { data: auth } = await supabase.auth.getUser();
+  // Check if the series exists in the series table
+  let { data: series, error } = await supabase
+    .from("series")
+    .select("*")
+    .eq("provider", provider)
+    .eq("provider_id", params.providerId)
+    .single();
 
-  if (!auth.user) {
-    return NextResponse.redirect("/login");
+  if (!series) {
+    // Series does not exist in the series table, so create it
+    const seriesDetails = await queryProviderForSeries(
+      provider,
+      params.providerId,
+      params.type as TMDBType
+    );
+
+    console.log("SERIESDETAILS", seriesDetails);
+
+    if (!seriesDetails) {
+      return NextResponse.json({
+        message: "Error occurred while fetching series",
+      });
+    }
+
+    const { data: newSeries, error: insertError } = await supabaseAdmin
+      .from("series")
+      .insert([seriesDetails])
+      .select("*")
+      .single();
+
+    if (insertError) {
+      // Handle error
+      console.error(insertError);
+      return NextResponse.json({
+        message: "Error occurred while creating series",
+      });
+    }
+
+    series = newSeries;
   }
-
-  const seriesDetailsRes = await fetch(
-    `http://localhost:3000/api/series/${body.type}/${params.providerId}`
-  );
-
-  console.log("\n\n\n\nEXECUTING\n\n\n\n");
-  const series = await seriesDetailsRes.json();
 
   if (!series) {
     return NextResponse.json(
@@ -121,52 +154,7 @@ export async function POST(
     );
   }
 
-  // Check if the user already has the series in their watchlist
-  const { data: watchlist } = await supabase
-    .from(`profile_${series.provider === "tmdb" ? "watchlists" : "readlists"}`)
-    .select("*")
-    .eq("profile_id", auth.user.id)
-    .eq("series_id", series.id)
-    .single();
-
-  if (watchlist) {
-    return NextResponse.json(
-      {
-        message: "Series already in watchlist",
-      },
-      { status: 400 }
-    );
-  }
-
-  // Link the series to the user's watchlist
-  const { data: watchlistData, error: watchlistError } = await supabase
-    .from(`profile_${series.provider === "tmdb" ? "watchlists" : "readlists"}`)
-    .insert([
-      {
-        profile_id: auth.user.id,
-        series_id: series.id,
-        priority: body.priority,
-      },
-    ])
-    .select("*");
-
-  if (watchlistError) {
-    // Handle error
-    return NextResponse.json(
-      {
-        message: "Error occurred while updating watchlist",
-      },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json(
-    {
-      message: "Series added to watchlist successfully",
-      data: watchlistData[0],
-    },
-    { status: 200 }
-  );
+  return NextResponse.json(series, { status: 200 });
 }
 
 // import { NextResponse } from "next/server";

@@ -70,6 +70,10 @@ function LoginWithEmail() {
 
     if (error) {
       console.error(error);
+      setLoading(false);
+      toast.error(error.message);
+
+      return;
     }
 
     if (data) {
@@ -79,6 +83,29 @@ function LoginWithEmail() {
     }
 
     setLoading(false);
+  }
+
+  async function resetPassword() {
+    // Check if the email field is empty
+    if (email == "") {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(
+      "pulsblake@gmail.com"
+    );
+
+    if (error) {
+      console.error(error);
+      toast.error("Error sending password reset email");
+      return;
+    }
+
+    if (data) {
+      console.log(data);
+      toast.success("A password reset email has been sent to your address");
+    }
   }
 
   return (
@@ -107,7 +134,11 @@ function LoginWithEmail() {
           }}
         />
 
-        <a className="" href="#">
+        <a
+          className="transition-colors hover:text-primary-500 hover:underline"
+          onClick={resetPassword}
+          href="#"
+        >
           Forgot password?
         </a>
       </section>

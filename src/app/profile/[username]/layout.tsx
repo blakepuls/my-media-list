@@ -115,7 +115,7 @@ function ProfileHeader({ profile }: ProfileHeaderProps) {
           <Skeleton className="w-24 h-24 absolute -bottom-7 left-5 !rounded-full !bg-gray-900" />
         )}
 
-        <section className="flex items-center w-full">
+        <section className="flex items-center w-full flex-wrap-reverse gap-3">
           <nav className=" flex gap-5 ml-32 font-medium bg-gray-900 items-center">
             <NavItem href="watchlist">Watchlist</NavItem>
             <NavItem href="readlist">Readlist</NavItem>

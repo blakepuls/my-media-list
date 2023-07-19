@@ -145,7 +145,7 @@ export default function UserMini() {
           alt=""
         /> */}
 
-        <div className=" ml-3">
+        <div className="hidden sm:block ml-3">
           <p className="text-lg leading-5 text-white">
             {user?.user_metadata.username}
           </p>

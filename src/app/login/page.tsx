@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/auth";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { toast } from "react-toastify";
 import { AiOutlineWarning } from "react-icons/ai";
+import { CgSpinner } from "react-icons/cg";
 
 interface AuthProviderProps {
   provider: "Facebook" | "Google" | "Microsoft" | "Twitter";
@@ -56,9 +57,11 @@ function AuthProvider({ provider, onClick, providerName }: AuthProviderProps) {
 
 function LoginWithEmail() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
 
   async function login() {
+    setLoading(true);
     // Login with email using supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -72,8 +75,10 @@ function LoginWithEmail() {
     if (data) {
       // Navigate to the dashboard
       console.log(data);
-      // window.location.href = "/";
+      window.location.href = "/";
     }
+
+    setLoading(false);
   }
 
   return (
@@ -85,6 +90,9 @@ function LoginWithEmail() {
           type="email"
           value={email}
           onChange={setEmail}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") login();
+          }}
           error={
             email.length > 0 && !email.includes("@") ? "Invalid email" : ""
           }
@@ -94,12 +102,19 @@ function LoginWithEmail() {
           type="password"
           value={password}
           onChange={setPassword}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") login();
+          }}
         />
+
         <a className="" href="#">
           Forgot password?
         </a>
       </section>
-      <button className="btn-primary w-full" onClick={login}>
+      <button className="btn-primary w-full" onClick={login} disabled={loading}>
+        <CgSpinner
+          className={`animate-spin mr-2 ${loading ? "visible" : "hidden"}`}
+        />
         Login
       </button>
     </div>
@@ -112,10 +127,10 @@ function SignUpWithEmailPrompt() {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [confirm, setConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   async function signUp() {
-    // Check if the username is taken, regardless of case
-
+    setLoading(true);
     // Sign up with email using supabase
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -137,6 +152,8 @@ function SignUpWithEmailPrompt() {
     if (data) {
       setConfirm(true);
     }
+
+    setLoading(false);
   }
 
   return (
@@ -154,12 +171,18 @@ function SignUpWithEmailPrompt() {
           type="text"
           value={username}
           onChange={setUsername}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") signUp();
+          }}
         />
         <Input
           label="Email"
           type="email"
           value={email}
           onChange={setEmail}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") signUp();
+          }}
           error={
             email.length > 0 && !email.includes("@") ? "Invalid email" : ""
           }
@@ -169,12 +192,18 @@ function SignUpWithEmailPrompt() {
           type="password"
           value={password}
           onChange={setPassword}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") signUp();
+          }}
         />
         <Input
           label="Confirm Password"
           type="password"
           value={passwordConfirm}
           onChange={setPasswordConfirm}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") signUp();
+          }}
           error={
             passwordConfirm.length > 0 && passwordConfirm !== password
               ? "Passwords do not match"
@@ -182,7 +211,14 @@ function SignUpWithEmailPrompt() {
           }
         />
       </section>
-      <button className="btn-primary w-full " onClick={signUp}>
+      <button
+        disabled={loading}
+        className="btn-primary w-full "
+        onClick={signUp}
+      >
+        <CgSpinner
+          className={`animate-spin mr-2 ${loading ? "visible" : "hidden"}`}
+        />
         Sign up
       </button>
 

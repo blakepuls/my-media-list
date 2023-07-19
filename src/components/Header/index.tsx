@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/auth";
 import UserMini from "../UserMini";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { profile } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <header
@@ -25,8 +27,11 @@ export default function Header() {
           Home
         </Link>
         <Link
+          onClick={() => {
+            router.refresh();
+          }}
           className="transition-colors hover:text-primary-500"
-          href={`/profile/${profile?.username}/watchlist`}
+          href={profile ? `/profile/${profile.username}/watchlist` : "/login"}
         >
           Profile
         </Link>

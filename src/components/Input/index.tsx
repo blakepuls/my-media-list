@@ -45,6 +45,7 @@ interface BaseInputProps {
   locale?: boolean;
   required?: boolean;
   ref?: React.RefObject<HTMLInputElement>;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   pattern?: string;
   background?: string;
   icon?: IconType;
@@ -125,6 +126,8 @@ function Input(props: InputProps): JSX.Element {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    props.onKeyDown?.(e);
+
     if (e.key === "Enter" && props.onSubmit) {
       e.preventDefault();
       if (props.type === "number") {

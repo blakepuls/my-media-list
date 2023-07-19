@@ -117,7 +117,7 @@ export default function UserMini() {
     window.location.pathname != "/login"
   )
     return (
-      <Link href={"/login"} className="btn-primary">
+      <Link href={"/login"} className=" btn-primary">
         Login
       </Link>
     );

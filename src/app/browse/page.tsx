@@ -14,7 +14,7 @@ export default function Browse() {
   return (
     <main className="flex flex-col items-center gap-3 w-full">
       <Search autoSearch={true} onChange={setSearch} />
-      <section className="flex justify-center items-center flex-wrap gap-5 overflow-y-auto mt-2x">
+      <section className="flex justify-center items-center flex-wrap gap-5 overflow-y-auto p-3 mt-2x">
         {search?.status === "loading" && (
           <>
             {Array.from({ length: 25 }).map((_, i) => (

@@ -36,7 +36,7 @@ export default function Home() {
           </h1>
           {/* <h1 className="text-5xl font-bold ">Your Favorites.</h1> */}
         </div>
-        <Search />
+        <Search autoSearch={true} />
       </div>
     </main>
   );

@@ -99,7 +99,7 @@ export function RankModal({
   }
 
   async function complete() {
-    await submit();
+    // await submit();
     if (onComplete) {
       onComplete({
         tier,

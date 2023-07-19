@@ -156,7 +156,7 @@ function ShareModal({ isOpen, setOpen }: ShareModalProps) {
         <h1 className="text-lg mb-2">Share</h1>
 
         <section className="flex gap-3 text-center w-full bg-gray-950 p-2 px-2 items-center rounded-md">
-          <Tooltip text={window.location.href} length={20} />
+          <span className="truncate w-40">{window.location.href}</span>
           <button
             className="flex items-center transition-colors hover:bg-primary-500 bg-gray-700 p-1.5 text-sm rounded-md gap-2"
             onClick={() => {

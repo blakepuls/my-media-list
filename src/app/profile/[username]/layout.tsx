@@ -13,8 +13,9 @@ import { AiOutlineShareAlt } from "react-icons/ai";
 import { BsFillShareFill } from "react-icons/bs";
 import Modal from "@/components/Modal";
 import Tooltip from "@/components/Tooltip";
+import Test from "@/components/Test";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: {
@@ -24,11 +25,14 @@ export default function RootLayout({
   const [profile, setProfile] = useState<null | undefined | Profile>(undefined);
 
   const getProfile = async () => {
+    console.log("getting profile");
     const { data: profile, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("username", params.username)
       .single();
+
+    setProfile(profile);
 
     if (error || !profile) {
       setProfile(null);
@@ -49,6 +53,7 @@ export default function RootLayout({
 
   return (
     <main className={`bg-gray-800 w-full`}>
+      <Test data={profile} />
       <ProfileHeader profile={profile} />
       {profile && <main className="p-3">{children}</main>}
     </main>
@@ -156,16 +161,16 @@ function ShareModal({ isOpen, setOpen }: ShareModalProps) {
         <h1 className="text-lg mb-2">Share</h1>
 
         <section className="flex gap-3 text-center w-full bg-gray-950 p-2 px-2 items-center rounded-md">
-          <span className="truncate w-40">{window.location.href}</span>
+          {/* <span className="truncate w-40">{window?.location?.href}</span>
           <button
             className="flex items-center transition-colors hover:bg-primary-500 bg-gray-700 p-1.5 text-sm rounded-md gap-2"
             onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
+              navigator.clipboard.writeText(window?.location?.href);
               setOpen(false);
             }}
           >
             Copy
-          </button>
+          </button> */}
         </section>
         {/* <div className="flex gap-2">
           <button className="flex items-center gap-2">

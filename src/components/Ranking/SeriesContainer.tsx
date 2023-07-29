@@ -189,7 +189,10 @@ const SeriesContainer: React.FC<SeriesContainerProps> = ({
         {Object.keys(items).map((key) => {
           const tier = Tiers[key];
           return (
-            <div key={key} className="flex gap-5 w-full ">
+            <div
+              key={key}
+              className={`flex gap-10 w-full ${tier.color} bg-opacity-10`}
+            >
               <h2
                 className={`text-3xl font-bold text-gray-100  p-3 rounded-sm shadow-md ${tier.color}`}
               >

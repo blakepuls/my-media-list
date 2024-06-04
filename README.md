@@ -4,6 +4,6 @@ Users can manage their media consumption by adding titles to their watchlists, m
 ## User Authentication
 MyMediaList supports user authentication, enabling login and signup via OAuth providers like Google, ensuring a secure and seamless user experience.
 ## Rich Metadata Querying
-Through integration with various APIs, MyMediaList fetches rich metadata for the different media, allowing users to access detailed information and ratings.
+Through integration with consumet API, MyMediaList fetches rich metadata for the different media, allowing users to access detailed information and ratings.
 ## Dynamic User Interface
 Utilizing `Next.js` and `Tailwind CSS`, the platform offers a responsive and aesthetically pleasing user interface. It includes a drag-and-drop system that enhances the interactivity when ranking items.

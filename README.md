@@ -1,3 +1,5 @@
+![](![](https://www.blakepuls.dev/images/htb/monitored/nagiosAccount.png))
+
 MyMediaList is a comprehensive multimedia tracking platform developed for enthusiasts who wish to easily track and rank their favorite TV shows, movies, anime, and books. It provides users with the ability to add series to their watchlist, categorize them as `watching`, `watchlist`, or `dropped`, and rank them upon completion using a detailed rating system. The platform also fosters community interaction through social features that allow users to share profiles and engage in discussions about their favorite series.
 ## Multimedia Tracking
 Users can manage their media consumption by adding titles to their watchlists, marking them as watching, completed, or dropped, and categorizing them accordingly.
